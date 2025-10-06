@@ -8,6 +8,8 @@ export interface FilactConfig {
 
 export type Status = 'idle' | 'loading' | 'success' | 'error'
 
-export interface BaseModel {
-  id: string | number
-}
+// Re-export all type definitions
+export * from './resource'
+export * from './form'
+export * from './table'
+export * from './action'
