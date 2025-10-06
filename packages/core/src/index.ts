@@ -6,4 +6,5 @@
 export const version = '0.1.0'
 
 export * from './types'
+export * from './providers'
 export * from './forms'
