@@ -12,11 +12,13 @@ import {
   type ColumnDef,
   type SortingState,
   type PaginationState,
+  type RowSelectionState,
 } from '@tanstack/react-table'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import type { BaseModel } from '../types/resource'
 import type { ResourceConfig } from '../resources/builder'
 import { useResourceList } from '../hooks/useResource'
+import { BulkActionsToolbar } from './BulkActionsToolbar'
 
 export interface ResourceTableProps<TModel extends BaseModel> {
   /** Resource configuration */
@@ -71,6 +73,7 @@ export function ResourceTable<TModel extends BaseModel>({
     pageIndex: initialPage - 1,
     pageSize: initialPageSize,
   })
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   // Build query params from table state
   const queryParams = useMemo(() => {
@@ -182,25 +185,34 @@ export function ResourceTable<TModel extends BaseModel>({
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onRowSelectionChange: setRowSelection,
     manualPagination: true,
     manualSorting: true,
     pageCount: data ? Math.ceil(data.total / pagination.pageSize) : 0,
     state: {
       sorting,
       pagination,
+      rowSelection,
     },
     enableRowSelection,
   })
 
-  // Handle selection changes
-  useMemo(() => {
+  // Get selected rows
+  const selectedRows = useMemo(() => {
+    return table.getSelectedRowModel().rows.map((row) => row.original)
+  }, [table.getSelectedRowModel().rows])
+
+  // Notify parent of selection changes
+  useEffect(() => {
     if (enableRowSelection && onSelectionChange) {
-      const selectedRows = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original)
       onSelectionChange(selectedRows)
     }
-  }, [table.getSelectedRowModel().rows, enableRowSelection, onSelectionChange])
+  }, [selectedRows, enableRowSelection, onSelectionChange])
+
+  // Clear selection handler
+  const handleClearSelection = () => {
+    setRowSelection({})
+  }
 
   // Loading state
   if (isLoading && !data) {
@@ -251,6 +263,17 @@ export function ResourceTable<TModel extends BaseModel>({
 
   return (
     <div className="w-full space-y-4">
+      {/* Bulk Actions Toolbar */}
+      {enableRowSelection && config.bulkActions && config.bulkActions.length > 0 && (
+        <BulkActionsToolbar
+          selectedCount={selectedRows.length}
+          selectedRows={selectedRows}
+          actions={config.bulkActions}
+          onClearSelection={handleClearSelection}
+          resourceName={config.model.name}
+        />
+      )}
+
       {/* Table */}
       <div className="border rounded-lg overflow-hidden">
         <table className="w-full">
