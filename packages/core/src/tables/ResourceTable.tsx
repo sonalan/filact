@@ -19,6 +19,8 @@ import type { BaseModel } from '../types/resource'
 import type { ResourceConfig } from '../resources/builder'
 import { useResourceList } from '../hooks/useResource'
 import { BulkActionsToolbar } from './BulkActionsToolbar'
+import { TableSearch } from './TableSearch'
+import { RowActionsDropdown } from './RowActionsDropdown'
 
 export interface ResourceTableProps<TModel extends BaseModel> {
   /** Resource configuration */
@@ -50,6 +52,12 @@ export interface ResourceTableProps<TModel extends BaseModel> {
 
   /** Row click handler */
   onRowClick?: (row: TModel) => void
+
+  /** Enable search */
+  enableSearch?: boolean
+
+  /** Search placeholder */
+  searchPlaceholder?: string
 }
 
 /**
@@ -67,6 +75,8 @@ export function ResourceTable<TModel extends BaseModel>({
   loadingState,
   errorState,
   onRowClick,
+  enableSearch = false,
+  searchPlaceholder = 'Search...',
 }: ResourceTableProps<TModel>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({
@@ -74,6 +84,7 @@ export function ResourceTable<TModel extends BaseModel>({
     pageSize: initialPageSize,
   })
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Build query params from table state
   const queryParams = useMemo(() => {
@@ -92,8 +103,15 @@ export function ResourceTable<TModel extends BaseModel>({
       }
     }
 
+    if (searchQuery) {
+      params.filter = {
+        ...params.filter,
+        q: searchQuery,
+      }
+    }
+
     return params
-  }, [pagination, sorting])
+  }, [pagination, sorting, searchQuery])
 
   const { data, isLoading, isError, error, refetch } = useResourceList(
     config,
@@ -156,26 +174,18 @@ export function ResourceTable<TModel extends BaseModel>({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div className="flex justify-end gap-2">
-            {config.rowActions?.map((action, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  action.handler?.(row.original)
-                }}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                disabled={action.disabled}
-              >
-                {action.label}
-              </button>
-            ))}
+          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+            <RowActionsDropdown
+              record={row.original}
+              actions={config.rowActions || []}
+              onActionComplete={() => refetch()}
+            />
           </div>
         ),
-        size: 120,
+        size: 60,
       },
     ]
-  }, [tableColumns, config.rowActions])
+  }, [tableColumns, config.rowActions, refetch])
 
   const table = useReactTable({
     data: data?.data ?? [],
@@ -212,6 +222,13 @@ export function ResourceTable<TModel extends BaseModel>({
   // Clear selection handler
   const handleClearSelection = () => {
     setRowSelection({})
+  }
+
+  // Search handler
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    // Reset to first page when searching
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   // Loading state
@@ -263,6 +280,15 @@ export function ResourceTable<TModel extends BaseModel>({
 
   return (
     <div className="w-full space-y-4">
+      {/* Search */}
+      {enableSearch && (
+        <TableSearch
+          value={searchQuery}
+          onSearch={handleSearch}
+          placeholder={searchPlaceholder}
+        />
+      )}
+
       {/* Bulk Actions Toolbar */}
       {enableRowSelection && config.bulkActions && config.bulkActions.length > 0 && (
         <BulkActionsToolbar
