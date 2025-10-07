@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ListPage } from './ListPage'
 import type { ResourceConfig } from '../resources/builder'
@@ -141,22 +142,42 @@ describe('ListPage', () => {
   })
 
   it('should display row actions', async () => {
+    const user = userEvent.setup()
     const handleEdit = vi.fn()
     const handleDelete = vi.fn()
 
     const configWithActions: ResourceConfig<TestModel> = {
       ...resourceConfig,
       rowActions: [
-        { label: 'Edit', handler: handleEdit },
-        { label: 'Delete', handler: handleDelete },
+        {
+          id: 'edit',
+          type: 'button',
+          label: 'Edit',
+          onClick: handleEdit,
+        },
+        {
+          id: 'delete',
+          type: 'button',
+          label: 'Delete',
+          onClick: handleDelete,
+        },
       ],
     }
 
     render(<ListPage config={configWithActions} />, { wrapper: createWrapper() })
 
+    // Wait for table to render
     await waitFor(() => {
-      expect(screen.getAllByText('Edit')).toHaveLength(2) // One for each row
-      expect(screen.getAllByText('Delete')).toHaveLength(2)
+      expect(screen.getAllByLabelText('Row actions')).toHaveLength(2)
+    })
+
+    // Click first row actions dropdown to verify actions are there
+    const dropdownButtons = screen.getAllByLabelText('Row actions')
+    await user.click(dropdownButtons[0])
+
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeInTheDocument()
     })
   })
 
