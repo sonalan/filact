@@ -20,6 +20,7 @@ import type { ResourceConfig } from '../resources/builder'
 import { useResourceList } from '../hooks/useResource'
 import { BulkActionsToolbar } from './BulkActionsToolbar'
 import { TableSearch } from './TableSearch'
+import { RowActionsDropdown } from './RowActionsDropdown'
 
 export interface ResourceTableProps<TModel extends BaseModel> {
   /** Resource configuration */
@@ -173,26 +174,18 @@ export function ResourceTable<TModel extends BaseModel>({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
-          <div className="flex justify-end gap-2">
-            {config.rowActions?.map((action, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  action.handler?.(row.original)
-                }}
-                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                disabled={action.disabled}
-              >
-                {action.label}
-              </button>
-            ))}
+          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
+            <RowActionsDropdown
+              record={row.original}
+              actions={config.rowActions || []}
+              onActionComplete={() => refetch()}
+            />
           </div>
         ),
-        size: 120,
+        size: 60,
       },
     ]
-  }, [tableColumns, config.rowActions])
+  }, [tableColumns, config.rowActions, refetch])
 
   const table = useReactTable({
     data: data?.data ?? [],

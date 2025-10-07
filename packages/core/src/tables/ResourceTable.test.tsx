@@ -209,14 +209,25 @@ describe('ResourceTable', () => {
   })
 
   it('should render row actions', async () => {
+    const user = userEvent.setup()
     const handleEdit = vi.fn()
     const handleDelete = vi.fn()
 
     const configWithActions: ResourceConfig<TestModel> = {
       ...resourceConfig,
       rowActions: [
-        { label: 'Edit', handler: handleEdit },
-        { label: 'Delete', handler: handleDelete },
+        {
+          id: 'edit',
+          type: 'button',
+          label: 'Edit',
+          onClick: handleEdit,
+        },
+        {
+          id: 'delete',
+          type: 'button',
+          label: 'Delete',
+          onClick: handleDelete,
+        },
       ],
     }
 
@@ -224,9 +235,19 @@ describe('ResourceTable', () => {
       wrapper: createWrapper(),
     })
 
+    // Wait for table to render
     await waitFor(() => {
-      expect(screen.getAllByText('Edit')).toHaveLength(3)
-      expect(screen.getAllByText('Delete')).toHaveLength(3)
+      expect(screen.getAllByLabelText('Row actions')).toHaveLength(3)
+    })
+
+    // Click first row actions dropdown
+    const dropdownButtons = screen.getAllByLabelText('Row actions')
+    await user.click(dropdownButtons[0])
+
+    // Should see actions in dropdown
+    await waitFor(() => {
+      expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument()
+      expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeInTheDocument()
     })
   })
 
@@ -236,20 +257,34 @@ describe('ResourceTable', () => {
 
     const configWithActions: ResourceConfig<TestModel> = {
       ...resourceConfig,
-      rowActions: [{ label: 'Edit', handler: handleEdit }],
+      rowActions: [
+        {
+          id: 'edit',
+          type: 'button',
+          label: 'Edit',
+          onClick: handleEdit,
+        },
+      ],
     }
 
     render(<ResourceTable config={configWithActions} />, {
       wrapper: createWrapper(),
     })
 
+    // Wait for table to render
     await waitFor(() => {
-      expect(screen.getAllByText('Edit')).toHaveLength(3)
+      expect(screen.getAllByLabelText('Row actions')).toHaveLength(3)
     })
 
-    const firstEditButton = screen.getAllByText('Edit')[0]
-    await user.click(firstEditButton)
+    // Click first row actions dropdown
+    const dropdownButtons = screen.getAllByLabelText('Row actions')
+    await user.click(dropdownButtons[0])
 
+    // Click edit action
+    const editButton = await screen.findByRole('menuitem', { name: 'Edit' })
+    await user.click(editButton)
+
+    // Should have called handler with first record
     expect(handleEdit).toHaveBeenCalledWith({
       id: 1,
       name: 'User 1',
