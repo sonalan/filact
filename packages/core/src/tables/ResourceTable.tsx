@@ -21,6 +21,9 @@ import { useResourceList } from '../hooks/useResource'
 import { BulkActionsToolbar } from './BulkActionsToolbar'
 import { TableSearch } from './TableSearch'
 import { RowActionsDropdown } from './RowActionsDropdown'
+import { ColumnVisibilityToggle } from './ColumnVisibilityToggle'
+import { TableExport } from './TableExport'
+import { TableDensityToggle, type TableDensity } from './TableDensityToggle'
 
 export interface ResourceTableProps<TModel extends BaseModel> {
   /** Resource configuration */
@@ -58,6 +61,21 @@ export interface ResourceTableProps<TModel extends BaseModel> {
 
   /** Search placeholder */
   searchPlaceholder?: string
+
+  /** Enable column visibility toggle */
+  enableColumnVisibility?: boolean
+
+  /** Enable data export */
+  enableExport?: boolean
+
+  /** Export formats */
+  exportFormats?: ('csv' | 'json')[]
+
+  /** Enable density toggle */
+  enableDensityToggle?: boolean
+
+  /** Initial density */
+  initialDensity?: TableDensity
 }
 
 /**
@@ -77,6 +95,11 @@ export function ResourceTable<TModel extends BaseModel>({
   onRowClick,
   enableSearch = false,
   searchPlaceholder = 'Search...',
+  enableColumnVisibility = false,
+  enableExport = false,
+  exportFormats = ['csv', 'json'],
+  enableDensityToggle = false,
+  initialDensity = 'comfortable',
 }: ResourceTableProps<TModel>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({
@@ -85,6 +108,8 @@ export function ResourceTable<TModel extends BaseModel>({
   })
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [searchQuery, setSearchQuery] = useState('')
+  const [columnVisibility, setColumnVisibility] = useState({})
+  const [density, setDensity] = useState<TableDensity>(initialDensity)
 
   // Build query params from table state
   const queryParams = useMemo(() => {
@@ -196,6 +221,7 @@ export function ResourceTable<TModel extends BaseModel>({
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     manualPagination: true,
     manualSorting: true,
     pageCount: data ? Math.ceil(data.total / pagination.pageSize) : 0,
@@ -203,6 +229,7 @@ export function ResourceTable<TModel extends BaseModel>({
       sorting,
       pagination,
       rowSelection,
+      columnVisibility,
     },
     enableRowSelection,
   })
@@ -230,6 +257,9 @@ export function ResourceTable<TModel extends BaseModel>({
     // Reset to first page when searching
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
+
+  // Get padding class based on density
+  const densityPadding = density === 'compact' ? 'px-4 py-1.5' : 'px-4 py-3'
 
   // Loading state
   if (isLoading && !data) {
@@ -280,13 +310,30 @@ export function ResourceTable<TModel extends BaseModel>({
 
   return (
     <div className="w-full space-y-4">
-      {/* Search */}
-      {enableSearch && (
-        <TableSearch
-          value={searchQuery}
-          onSearch={handleSearch}
-          placeholder={searchPlaceholder}
-        />
+      {/* Search and Table Controls */}
+      {(enableSearch || enableColumnVisibility || enableExport || enableDensityToggle) && (
+        <div className="flex items-center gap-4">
+          {enableSearch && (
+            <div className="flex-1">
+              <TableSearch
+                value={searchQuery}
+                onSearch={handleSearch}
+                placeholder={searchPlaceholder}
+              />
+            </div>
+          )}
+          {enableColumnVisibility && <ColumnVisibilityToggle table={table} />}
+          {enableExport && (
+            <TableExport
+              table={table}
+              filename={config.model.name.toLowerCase()}
+              formats={exportFormats}
+            />
+          )}
+          {enableDensityToggle && (
+            <TableDensityToggle density={density} onDensityChange={setDensity} />
+          )}
+        </div>
       )}
 
       {/* Bulk Actions Toolbar */}
@@ -309,7 +356,7 @@ export function ResourceTable<TModel extends BaseModel>({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-left text-sm font-medium text-gray-700"
+                    className={`${densityPadding} text-left text-sm font-medium text-gray-700`}
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : (
@@ -352,7 +399,7 @@ export function ResourceTable<TModel extends BaseModel>({
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
-                    className="px-4 py-3 text-sm text-gray-900"
+                    className={`${densityPadding} text-sm text-gray-900`}
                     style={{ width: cell.column.getSize() }}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
