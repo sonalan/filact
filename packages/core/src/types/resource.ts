@@ -47,7 +47,7 @@ export interface ModelDefinition<TModel extends BaseModel = BaseModel> {
  */
 export interface NavigationConfig {
   /** Display label in navigation */
-  label: string
+  label?: string
 
   /** Icon component or icon name */
   icon?: React.ReactNode | string
@@ -56,13 +56,16 @@ export interface NavigationConfig {
   group?: string
 
   /** Sort order in navigation */
-  sort?: number
+  order?: number
 
   /** Whether to show in navigation */
   visible?: boolean
 
   /** Badge content (e.g., count) */
   badge?: string | number
+
+  /** Badge color variant */
+  badgeColor?: string
 }
 
 /**
