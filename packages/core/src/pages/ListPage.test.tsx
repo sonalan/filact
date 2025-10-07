@@ -77,9 +77,10 @@ describe('ListPage', () => {
   it('should display loading state', () => {
     mockProvider.getList = vi.fn(() => new Promise(() => {})) // Never resolves
 
-    render(<ListPage config={resourceConfig} />, { wrapper: createWrapper() })
+    const { container } = render(<ListPage config={resourceConfig} />, { wrapper: createWrapper() })
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    // Check for skeleton loading state
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument()
   })
 
   it('should display error state', async () => {
@@ -159,15 +160,15 @@ describe('ListPage', () => {
     })
   })
 
-  it('should display record count', async () => {
+  it('should display record count in pagination', async () => {
     render(<ListPage config={resourceConfig} />, { wrapper: createWrapper() })
 
     await waitFor(() => {
-      expect(screen.getByText('2 records')).toBeInTheDocument()
+      expect(screen.getByText(/Showing 1 to 2 of 2 results/)).toBeInTheDocument()
     })
   })
 
-  it('should display singular record text for one record', async () => {
+  it('should display pagination info for single record', async () => {
     mockProvider.getList = vi.fn().mockResolvedValue({
       data: [{ id: 1, name: 'User 1', email: 'user1@test.com' }],
       total: 1,
@@ -176,7 +177,7 @@ describe('ListPage', () => {
     render(<ListPage config={resourceConfig} />, { wrapper: createWrapper() })
 
     await waitFor(() => {
-      expect(screen.getByText('1 record')).toBeInTheDocument()
+      expect(screen.getByText(/Showing 1 to 1 of 1 results/)).toBeInTheDocument()
     })
   })
 

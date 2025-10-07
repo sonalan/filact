@@ -6,3 +6,4 @@
 export * from './builder'
 export * from './columns'
 export * from './filters'
+export * from './ResourceTable'
