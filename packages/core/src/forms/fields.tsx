@@ -335,6 +335,76 @@ export class SwitchBuilder extends CheckboxBuilder {
 }
 
 /**
+ * Radio field builder
+ */
+export class RadioBuilder {
+  private config: Partial<RadioFieldConfig> = {
+    type: 'radio',
+    name: '',
+    options: [],
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  options(options: SelectOption[]): this {
+    this.config.options = options
+    return this
+  }
+
+  inline(inline = true): this {
+    this.config.inline = inline
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  build(): RadioFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    if (!this.config.options || this.config.options.length === 0) {
+      throw new Error('Radio field must have at least one option')
+    }
+    return this.config as RadioFieldConfig
+  }
+}
+
+/**
  * Factory functions for creating field builders
  */
 export const TextInput = {
@@ -367,4 +437,8 @@ export const Checkbox = {
 
 export const Switch = {
   make: (name: string, label: string) => new SwitchBuilder(name, label),
+}
+
+export const Radio = {
+  make: (name: string) => new RadioBuilder(name),
 }
