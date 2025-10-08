@@ -395,4 +395,77 @@ describe('NotificationProvider', () => {
 
     vi.useFakeTimers()
   })
+
+  it('should show loading state during async action', async () => {
+    vi.useRealTimers()
+    const user = userEvent.setup()
+    let resolveAction: () => void
+    const actionPromise = new Promise<void>((resolve) => {
+      resolveAction = resolve
+    })
+    const onClick = vi.fn().mockReturnValue(actionPromise)
+
+    const { result } = renderHook(() => useNotifications(), {
+      wrapper: ({ children }) => <NotificationProvider>{children}</NotificationProvider>,
+    })
+
+    act(() => {
+      result.current.success('Async action', {
+        actions: [{ label: 'Process', onClick }],
+      })
+    })
+
+    const actionButton = screen.getByText('Process')
+    await user.click(actionButton)
+
+    // Should show loading spinner
+    await waitFor(() => {
+      const spinner = actionButton.querySelector('.animate-spin')
+      expect(spinner).toBeInTheDocument()
+    })
+
+    // Resolve the action
+    act(() => {
+      resolveAction!()
+    })
+
+    vi.useFakeTimers()
+  })
+
+  it('should not execute action multiple times during loading', async () => {
+    vi.useRealTimers()
+    const user = userEvent.setup()
+    let resolveAction: () => void
+    const actionPromise = new Promise<void>((resolve) => {
+      resolveAction = resolve
+    })
+    const onClick = vi.fn().mockReturnValue(actionPromise)
+
+    const { result } = renderHook(() => useNotifications(), {
+      wrapper: ({ children }) => <NotificationProvider>{children}</NotificationProvider>,
+    })
+
+    act(() => {
+      result.current.success('Async action', {
+        actions: [{ label: 'Process', onClick }],
+      })
+    })
+
+    const actionButton = screen.getByText('Process')
+
+    // Click multiple times rapidly
+    await user.click(actionButton)
+    await user.click(actionButton)
+    await user.click(actionButton)
+
+    // Should only be called once
+    expect(onClick).toHaveBeenCalledTimes(1)
+
+    // Resolve the action
+    act(() => {
+      resolveAction!()
+    })
+
+    vi.useFakeTimers()
+  })
 })
