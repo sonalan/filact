@@ -62,6 +62,11 @@ export class TextInputBuilder {
     return this
   }
 
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
   visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
     this.config.visible = visible
     return this
@@ -168,6 +173,11 @@ export class NumberInputBuilder {
     return this
   }
 
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
   visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
     this.config.visible = visible
     return this
@@ -248,6 +258,11 @@ export class SelectBuilder {
     return this
   }
 
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
   visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
     this.config.visible = visible
     return this
@@ -298,6 +313,11 @@ export class CheckboxBuilder {
 
   disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
     this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
     return this
   }
 
@@ -370,6 +390,11 @@ export class RadioBuilder {
 
   disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
     this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
     return this
   }
 
