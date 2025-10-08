@@ -347,4 +347,52 @@ describe('NotificationProvider', () => {
 
     expect(onDismiss).toHaveBeenCalled()
   })
+
+  it('should navigate when action has href', async () => {
+    vi.useRealTimers()
+    const user = userEvent.setup()
+    const originalLocation = window.location.href
+
+    const { result } = renderHook(() => useNotifications(), {
+      wrapper: ({ children }) => <NotificationProvider>{children}</NotificationProvider>,
+    })
+
+    act(() => {
+      result.current.success('Navigation notification', {
+        actions: [{ label: 'Go to page', href: '/test-page' }],
+      })
+    })
+
+    const actionLink = screen.getByText('Go to page')
+    expect(actionLink).toBeInTheDocument()
+    expect(actionLink.tagName).toBe('A')
+    expect(actionLink).toHaveAttribute('href', '/test-page')
+
+    vi.useFakeTimers()
+  })
+
+  it('should execute onClick and navigate when both are provided', async () => {
+    vi.useRealTimers()
+    const onClick = vi.fn()
+    const user = userEvent.setup()
+
+    const { result } = renderHook(() => useNotifications(), {
+      wrapper: ({ children }) => <NotificationProvider>{children}</NotificationProvider>,
+    })
+
+    act(() => {
+      result.current.success('Combined action', {
+        actions: [{ label: 'Action', onClick, href: '/page' }],
+      })
+    })
+
+    const actionLink = screen.getByText('Action')
+    await user.click(actionLink)
+
+    await waitFor(() => {
+      expect(onClick).toHaveBeenCalled()
+    })
+
+    vi.useFakeTimers()
+  })
 })
