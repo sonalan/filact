@@ -140,6 +140,17 @@ export function RowActionsDropdown<TModel extends BaseModel>({
             <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
               <div className="py-1" role="menu">
                 {visibleActions.map((action) => {
+                  // Handle separator
+                  if (action.type === 'separator') {
+                    return (
+                      <div
+                        key={action.id}
+                        className="my-1 border-t border-gray-200"
+                        role="separator"
+                      />
+                    )
+                  }
+
                   const disabled = isActionDisabled(action)
                   const isLoading = executingAction === action.id
 

@@ -142,6 +142,15 @@ export interface LinkActionConfig<TModel extends BaseModel = BaseModel> extends 
 }
 
 /**
+ * Action separator
+ */
+export interface ActionSeparatorConfig {
+  type: 'separator'
+  /** Separator identifier */
+  id: string
+}
+
+/**
  * Dropdown action group
  */
 export interface ActionGroupConfig<TModel extends BaseModel = BaseModel> {
@@ -168,6 +177,7 @@ export type Action<TModel extends BaseModel = BaseModel> =
   | ButtonActionConfig<TModel>
   | LinkActionConfig<TModel>
   | ActionGroupConfig<TModel>
+  | ActionSeparatorConfig
 
 /**
  * Bulk action configuration
