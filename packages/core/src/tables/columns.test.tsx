@@ -60,6 +60,13 @@ describe('Column Builders', () => {
       expect(column.sortable).toBe(true)
     })
 
+    it('should set custom sort function', () => {
+      const sortFn = (a: any, b: any) => a.name.localeCompare(b.name)
+      const column = TextColumn.make('name').sortFn(sortFn).build()
+
+      expect(column.sortFn).toBe(sortFn)
+    })
+
     it('should set searchable', () => {
       const column = TextColumn.make('email').searchable().build()
 
