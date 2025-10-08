@@ -9,6 +9,7 @@ import type {
   ButtonActionConfig,
   LinkActionConfig,
   ActionGroupConfig,
+  ActionSeparatorConfig,
   BulkAction,
   ActionVariant,
   ActionSize,
@@ -276,4 +277,31 @@ export const BulkAction = {
     label: string,
     action: (selected: TModel[]) => void | Promise<void>
   ) => new BulkActionBuilder<TModel>(id, label, action),
+}
+
+/**
+ * Action separator builder
+ */
+let separatorCounter = 0
+
+export class ActionSeparatorBuilder {
+  private config: ActionSeparatorConfig
+
+  constructor(id: string) {
+    this.config = {
+      type: 'separator',
+      id,
+    }
+  }
+
+  build(): ActionSeparatorConfig {
+    return this.config
+  }
+}
+
+export const ActionSeparator = {
+  make: (id?: string) => {
+    const generatedId = id || `separator-${Date.now()}-${separatorCounter++}`
+    return new ActionSeparatorBuilder(generatedId)
+  },
 }
