@@ -128,6 +128,7 @@ function getDefaultIcon(variant: NotificationVariant) {
 export function Toast({ notification, onDismiss, onAutoDismiss }: ToastProps) {
   const [isExiting, setIsExiting] = useState(false)
   const [progress, setProgress] = useState(100)
+  const [loadingActions, setLoadingActions] = useState<Set<number>>(new Set())
 
   const variant = notification.variant || 'default'
   const styles = getVariantStyles(variant)
@@ -207,15 +208,63 @@ export function Toast({ notification, onDismiss, onAutoDismiss }: ToastProps) {
             {notification.actions && notification.actions.length > 0 && (
               <div className="mt-3 flex space-x-3">
                 {notification.actions.map((action, index) => {
+                  const isLoading = loadingActions.has(index)
+
                   const handleActionClick = async () => {
-                    if (action.onClick) {
-                      await action.onClick()
+                    if (isLoading) return
+
+                    setLoadingActions((prev) => new Set(prev).add(index))
+
+                    try {
+                      if (action.onClick) {
+                        await action.onClick()
+                      }
+                      if (action.href) {
+                        window.location.href = action.href
+                      }
+                      handleDismiss()
+                    } finally {
+                      setLoadingActions((prev) => {
+                        const next = new Set(prev)
+                        next.delete(index)
+                        return next
+                      })
                     }
-                    if (action.href) {
-                      window.location.href = action.href
-                    }
-                    handleDismiss()
                   }
+
+                  const buttonContent = (
+                    <>
+                      {isLoading && (
+                        <svg
+                          className="animate-spin h-4 w-4 mr-1 inline-block"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                      )}
+                      {action.label}
+                    </>
+                  )
+
+                  const className = `text-sm font-medium transition-colors ${
+                    action.primary
+                      ? 'text-blue-600 hover:text-blue-700'
+                      : 'text-gray-600 hover:text-gray-700'
+                  } ${isLoading ? 'opacity-70 cursor-wait' : ''}`
 
                   return action.href ? (
                     <a
@@ -225,25 +274,18 @@ export function Toast({ notification, onDismiss, onAutoDismiss }: ToastProps) {
                         e.preventDefault()
                         handleActionClick()
                       }}
-                      className={`text-sm font-medium transition-colors ${
-                        action.primary
-                          ? 'text-blue-600 hover:text-blue-700'
-                          : 'text-gray-600 hover:text-gray-700'
-                      }`}
+                      className={className}
                     >
-                      {action.label}
+                      {buttonContent}
                     </a>
                   ) : (
                     <button
                       key={index}
                       onClick={handleActionClick}
-                      className={`text-sm font-medium transition-colors ${
-                        action.primary
-                          ? 'text-blue-600 hover:text-blue-700'
-                          : 'text-gray-600 hover:text-gray-700'
-                      }`}
+                      disabled={isLoading}
+                      className={className}
                     >
-                      {action.label}
+                      {buttonContent}
                     </button>
                   )
                 })}
