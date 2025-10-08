@@ -4,7 +4,7 @@
  */
 
 import type { BaseModel } from '../types/resource'
-import type { TableSchema, Column, Filter, Sort, PaginationConfig } from '../types/table'
+import type { TableSchema, Column, Filter, Sort, PaginationConfig, TableHeaderAction } from '../types/table'
 
 /**
  * Table Builder class
@@ -19,6 +19,7 @@ export class TableBuilder<TModel extends BaseModel = BaseModel> {
   private searchPlaceholderText?: string
   private emptyStateContent?: React.ReactNode
   private loadingStateContent?: React.ReactNode
+  private headerActionsList?: TableHeaderAction[]
 
   /**
    * Set table columns
@@ -122,6 +123,14 @@ export class TableBuilder<TModel extends BaseModel = BaseModel> {
   }
 
   /**
+   * Set header actions
+   */
+  withHeaderActions(actions: TableHeaderAction[]): this {
+    this.headerActionsList = actions
+    return this
+  }
+
+  /**
    * Build the final table schema
    */
   build(): TableSchema<TModel> {
@@ -135,6 +144,7 @@ export class TableBuilder<TModel extends BaseModel = BaseModel> {
       searchPlaceholder: this.searchPlaceholderText,
       emptyState: this.emptyStateContent,
       loadingState: this.loadingStateContent,
+      headerActions: this.headerActionsList,
     }
   }
 }
