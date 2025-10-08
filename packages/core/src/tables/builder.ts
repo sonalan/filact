@@ -29,6 +29,29 @@ export class TableBuilder<TModel extends BaseModel = BaseModel> {
   }
 
   /**
+   * Add columns to the existing column list
+   */
+  addColumns(...columns: Column<TModel>[]): this {
+    this.columnList.push(...columns)
+    return this
+  }
+
+  /**
+   * Remove a column by accessor
+   */
+  removeColumn(accessor: keyof TModel | string): this {
+    this.columnList = this.columnList.filter((col) => col.accessor !== accessor)
+    return this
+  }
+
+  /**
+   * Get a column by accessor
+   */
+  getColumn(accessor: keyof TModel | string): Column<TModel> | undefined {
+    return this.columnList.find((col) => col.accessor === accessor)
+  }
+
+  /**
    * Add filters to the table
    */
   withFilters(filters: Filter[]): this {
