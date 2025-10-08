@@ -244,6 +244,35 @@ export interface PaginationConfig {
 }
 
 /**
+ * Table header action
+ */
+export interface TableHeaderAction {
+  /** Action identifier */
+  id: string
+
+  /** Action label */
+  label: string
+
+  /** Action icon */
+  icon?: ReactNode
+
+  /** Action handler */
+  onClick: () => void | Promise<void>
+
+  /** Action variant */
+  variant?: 'default' | 'primary' | 'destructive' | 'outline' | 'ghost'
+
+  /** Whether action is disabled */
+  disabled?: boolean
+
+  /** Action tooltip */
+  tooltip?: string
+
+  /** Custom CSS class */
+  className?: string
+}
+
+/**
  * Table schema - the complete table definition
  */
 export interface TableSchema<TModel extends BaseModel = BaseModel> {
@@ -256,4 +285,5 @@ export interface TableSchema<TModel extends BaseModel = BaseModel> {
   searchPlaceholder?: string
   emptyState?: ReactNode
   loadingState?: ReactNode
+  headerActions?: TableHeaderAction[]
 }

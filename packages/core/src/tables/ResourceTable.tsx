@@ -24,6 +24,8 @@ import { RowActionsDropdown } from './RowActionsDropdown'
 import { ColumnVisibilityToggle } from './ColumnVisibilityToggle'
 import { TableExport } from './TableExport'
 import { TableDensityToggle, type TableDensity } from './TableDensityToggle'
+import { TableHeaderActions } from './TableHeaderActions'
+import type { TableHeaderAction } from '../types/table'
 
 export interface ResourceTableProps<TModel extends BaseModel> {
   /** Resource configuration */
@@ -76,6 +78,9 @@ export interface ResourceTableProps<TModel extends BaseModel> {
 
   /** Initial density */
   initialDensity?: TableDensity
+
+  /** Header actions */
+  headerActions?: TableHeaderAction[]
 }
 
 /**
@@ -100,6 +105,7 @@ export function ResourceTable<TModel extends BaseModel>({
   exportFormats = ['csv', 'json'],
   enableDensityToggle = false,
   initialDensity = 'comfortable',
+  headerActions,
 }: ResourceTableProps<TModel>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState<PaginationState>({
@@ -310,6 +316,14 @@ export function ResourceTable<TModel extends BaseModel>({
 
   return (
     <div className="w-full space-y-4">
+      {/* Header Actions */}
+      {headerActions && headerActions.length > 0 && (
+        <div className="flex items-center justify-between">
+          <div className="flex-1" />
+          <TableHeaderActions actions={headerActions} />
+        </div>
+      )}
+
       {/* Search and Table Controls */}
       {(enableSearch || enableColumnVisibility || enableExport || enableDensityToggle) && (
         <div className="flex items-center gap-4">
