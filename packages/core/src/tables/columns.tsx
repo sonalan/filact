@@ -48,6 +48,11 @@ abstract class BaseColumnBuilder<TConfig, TModel extends BaseModel = BaseModel> 
     return this
   }
 
+  sortFn(sortFn: (a: TModel, b: TModel) => number): this {
+    ;(this.config as any).sortFn = sortFn
+    return this
+  }
+
   searchable(searchable = true): this {
     ;(this.config as any).searchable = searchable
     return this
