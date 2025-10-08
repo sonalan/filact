@@ -167,4 +167,59 @@ describe('TableBuilder', () => {
     expect(schema.searchable).toBe(true)
     expect(schema.searchPlaceholder).toBe('Search...')
   })
+
+  it('should add columns to existing column list', () => {
+    const builder = createTableBuilder()
+    const schema = builder
+      .columns([TextColumn.make('name').label('Name').build()])
+      .addColumns(
+        TextColumn.make('email').label('Email').build(),
+        NumberColumn.make('age').label('Age').build()
+      )
+      .build()
+
+    expect(schema.columns).toHaveLength(3)
+    expect(schema.columns[0].accessor).toBe('name')
+    expect(schema.columns[1].accessor).toBe('email')
+    expect(schema.columns[2].accessor).toBe('age')
+  })
+
+  it('should remove column by accessor', () => {
+    const builder = createTableBuilder()
+    const schema = builder
+      .columns([
+        TextColumn.make('name').label('Name').build(),
+        TextColumn.make('email').label('Email').build(),
+        NumberColumn.make('age').label('Age').build(),
+      ])
+      .removeColumn('email')
+      .build()
+
+    expect(schema.columns).toHaveLength(2)
+    expect(schema.columns[0].accessor).toBe('name')
+    expect(schema.columns[1].accessor).toBe('age')
+  })
+
+  it('should get column by accessor', () => {
+    const builder = createTableBuilder()
+    builder.columns([
+      TextColumn.make('name').label('Name').build(),
+      TextColumn.make('email').label('Email').build(),
+    ])
+
+    const column = builder.getColumn('email')
+
+    expect(column).toBeDefined()
+    expect(column?.accessor).toBe('email')
+    expect(column?.label).toBe('Email')
+  })
+
+  it('should return undefined when getting non-existent column', () => {
+    const builder = createTableBuilder()
+    builder.columns([TextColumn.make('name').label('Name').build()])
+
+    const column = builder.getColumn('nonexistent')
+
+    expect(column).toBeUndefined()
+  })
 })
