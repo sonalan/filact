@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { ButtonAction, LinkAction, ActionGroup, BulkAction } from './builders'
+import { ButtonAction, LinkAction, ActionGroup, BulkAction, ActionSeparator } from './builders'
 
 describe('Action Builders', () => {
   describe('ButtonAction', () => {
@@ -430,6 +430,29 @@ describe('Action Builders', () => {
       expect(action.requiresConfirmation).toBe(true)
       expect(action.visible).toBe(true)
       expect(action.disabled).toBe(false)
+    })
+  })
+
+  describe('ActionSeparator', () => {
+    it('should create action separator', () => {
+      const separator = ActionSeparator.make('sep-1').build()
+
+      expect(separator.type).toBe('separator')
+      expect(separator.id).toBe('sep-1')
+    })
+
+    it('should generate id if not provided', () => {
+      const separator = ActionSeparator.make().build()
+
+      expect(separator.type).toBe('separator')
+      expect(separator.id).toMatch(/^separator-/)
+    })
+
+    it('should create multiple separators with unique ids', () => {
+      const sep1 = ActionSeparator.make().build()
+      const sep2 = ActionSeparator.make().build()
+
+      expect(sep1.id).not.toBe(sep2.id)
     })
   })
 })
