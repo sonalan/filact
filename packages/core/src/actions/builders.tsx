@@ -23,14 +23,19 @@ import type {
 abstract class BaseActionBuilder<TConfig, TModel extends BaseModel = BaseModel> {
   protected config: Partial<TConfig>
 
-  constructor(id: string, label: string) {
+  constructor(id: string, label: string | ((record?: TModel, selected?: TModel[]) => string)) {
     this.config = {
       id,
       label,
     } as Partial<TConfig>
   }
 
-  icon(icon: ReactNode): this {
+  label(label: string | ((record?: TModel, selected?: TModel[]) => string)): this {
+    ;(this.config as any).label = label
+    return this
+  }
+
+  icon(icon: ReactNode | ((record?: TModel, selected?: TModel[]) => ReactNode)): this {
     ;(this.config as any).icon = icon
     return this
   }
@@ -197,7 +202,12 @@ export class BulkActionBuilder<TModel extends BaseModel = BaseModel> {
     }
   }
 
-  icon(icon: ReactNode): this {
+  label(label: string | ((selected: TModel[]) => string)): this {
+    this.config.label = label
+    return this
+  }
+
+  icon(icon: ReactNode | ((selected: TModel[]) => ReactNode)): this {
     this.config.icon = icon
     return this
   }
