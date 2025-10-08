@@ -206,22 +206,47 @@ export function Toast({ notification, onDismiss, onAutoDismiss }: ToastProps) {
             {/* Actions */}
             {notification.actions && notification.actions.length > 0 && (
               <div className="mt-3 flex space-x-3">
-                {notification.actions.map((action, index) => (
-                  <button
-                    key={index}
-                    onClick={async () => {
+                {notification.actions.map((action, index) => {
+                  const handleActionClick = async () => {
+                    if (action.onClick) {
                       await action.onClick()
-                      handleDismiss()
-                    }}
-                    className={`text-sm font-medium transition-colors ${
-                      action.primary
-                        ? 'text-blue-600 hover:text-blue-700'
-                        : 'text-gray-600 hover:text-gray-700'
-                    }`}
-                  >
-                    {action.label}
-                  </button>
-                ))}
+                    }
+                    if (action.href) {
+                      window.location.href = action.href
+                    }
+                    handleDismiss()
+                  }
+
+                  return action.href ? (
+                    <a
+                      key={index}
+                      href={action.href}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleActionClick()
+                      }}
+                      className={`text-sm font-medium transition-colors ${
+                        action.primary
+                          ? 'text-blue-600 hover:text-blue-700'
+                          : 'text-gray-600 hover:text-gray-700'
+                      }`}
+                    >
+                      {action.label}
+                    </a>
+                  ) : (
+                    <button
+                      key={index}
+                      onClick={handleActionClick}
+                      className={`text-sm font-medium transition-colors ${
+                        action.primary
+                          ? 'text-blue-600 hover:text-blue-700'
+                          : 'text-gray-600 hover:text-gray-700'
+                      }`}
+                    >
+                      {action.label}
+                    </button>
+                  )
+                })}
               </div>
             )}
           </div>

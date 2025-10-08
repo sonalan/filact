@@ -29,7 +29,10 @@ export interface NotificationAction {
   label: string
 
   /** Action callback */
-  onClick: () => void | Promise<void>
+  onClick?: () => void | Promise<void>
+
+  /** Navigation path */
+  href?: string
 
   /** Whether this is a primary action */
   primary?: boolean
