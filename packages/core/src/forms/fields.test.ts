@@ -8,6 +8,7 @@ import {
   Select,
   Checkbox,
   Switch,
+  Radio,
 } from './fields'
 
 describe('Field Builders', () => {
@@ -306,6 +307,103 @@ describe('Field Builders', () => {
 
       expect(field1.label).toBe('User Name')
       expect(field2.label).toBe('User Name')
+    })
+  })
+
+  describe('Radio', () => {
+    it('should create radio field', () => {
+      const field = Radio.make('status')
+        .label('Status')
+        .options([
+          { label: 'Active', value: 'active' },
+          { label: 'Inactive', value: 'inactive' },
+        ])
+        .build()
+
+      expect(field.type).toBe('radio')
+      expect(field.name).toBe('status')
+      expect(field.label).toBe('Status')
+      expect(field.options).toHaveLength(2)
+    })
+
+    it('should set inline layout', () => {
+      const field = Radio.make('status')
+        .options([
+          { label: 'Yes', value: 'yes' },
+          { label: 'No', value: 'no' },
+        ])
+        .inline()
+        .build()
+
+      expect(field.inline).toBe(true)
+    })
+
+    it('should set required', () => {
+      const field = Radio.make('status')
+        .options([{ label: 'Option 1', value: '1' }])
+        .required()
+        .build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set disabled', () => {
+      const field = Radio.make('status')
+        .options([{ label: 'Option 1', value: '1' }])
+        .disabled(true)
+        .build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set conditional disabled', () => {
+      const condition = (values: Record<string, unknown>) => values.locked === true
+      const field = Radio.make('status')
+        .options([{ label: 'Option 1', value: '1' }])
+        .disabled(condition)
+        .build()
+
+      expect(field.disabled).toBe(condition)
+    })
+
+    it('should set helper text', () => {
+      const field = Radio.make('status')
+        .options([{ label: 'Option 1', value: '1' }])
+        .helperText('Select one option')
+        .build()
+
+      expect(field.helperText).toBe('Select one option')
+    })
+
+    it('should set default value', () => {
+      const field = Radio.make('status')
+        .options([
+          { label: 'Active', value: 'active' },
+          { label: 'Inactive', value: 'inactive' },
+        ])
+        .default('active')
+        .build()
+
+      expect(field.default).toBe('active')
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = Radio.make('')
+        .options([{ label: 'Option 1', value: '1' }])
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should throw error if options are empty', () => {
+      const builder = Radio.make('status')
+
+      expect(() => builder.build()).toThrow('Radio field must have at least one option')
+    })
+
+    it('should throw error if options array is empty', () => {
+      const builder = Radio.make('status').options([])
+
+      expect(() => builder.build()).toThrow('Radio field must have at least one option')
     })
   })
 })
