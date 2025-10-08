@@ -222,4 +222,35 @@ describe('TableBuilder', () => {
 
     expect(column).toBeUndefined()
   })
+
+  it('should set header actions', () => {
+    const builder = createTableBuilder()
+    const actions = [
+      {
+        id: 'create',
+        label: 'Create New',
+        onClick: () => {},
+      },
+      {
+        id: 'export',
+        label: 'Export',
+        onClick: () => {},
+        variant: 'outline' as const,
+      },
+    ]
+
+    const schema = builder.columns([]).withHeaderActions(actions).build()
+
+    expect(schema.headerActions).toHaveLength(2)
+    expect(schema.headerActions?.[0].id).toBe('create')
+    expect(schema.headerActions?.[0].label).toBe('Create New')
+    expect(schema.headerActions?.[1].variant).toBe('outline')
+  })
+
+  it('should build table without header actions when not set', () => {
+    const builder = createTableBuilder()
+    const schema = builder.columns([]).build()
+
+    expect(schema.headerActions).toBeUndefined()
+  })
 })
