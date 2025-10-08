@@ -209,6 +209,20 @@ describe('Action Builders', () => {
       expect(action.icon).toBe('<ViewIcon />')
     })
 
+    it('should support dynamic label', () => {
+      const labelFn = (record: any) => `View ${record.name}`
+      const action = LinkAction.make('view', labelFn, '/users/1').build()
+
+      expect(action.label).toBe(labelFn)
+    })
+
+    it('should support dynamic icon', () => {
+      const iconFn = (record: any) => record.isActive ? '<ActiveIcon />' : '<InactiveIcon />'
+      const action = LinkAction.make('view', 'View', '/users/1').icon(iconFn).build()
+
+      expect(action.icon).toBe(iconFn)
+    })
+
     it('should set variant', () => {
       const action = LinkAction.make('view', 'View', '/users/1').variant('outline').build()
 
@@ -370,6 +384,32 @@ describe('Action Builders', () => {
       const action = BulkAction.make('export', 'Export', actionFn).disabled(true).build()
 
       expect(action.disabled).toBe(true)
+    })
+
+    it('should support dynamic label', () => {
+      const actionFn = vi.fn()
+      const labelFn = (selected: any[]) => `Delete ${selected.length} items`
+      const action = BulkAction.make('delete', labelFn, actionFn).build()
+
+      expect(action.label).toBe(labelFn)
+    })
+
+    it('should support dynamic icon', () => {
+      const actionFn = vi.fn()
+      const iconFn = (selected: any[]) => selected.length > 5 ? '<BulkIcon />' : '<SmallIcon />'
+      const action = BulkAction.make('export', 'Export', actionFn).icon(iconFn).build()
+
+      expect(action.icon).toBe(iconFn)
+    })
+
+    it('should update label dynamically', () => {
+      const actionFn = vi.fn()
+      const newLabelFn = (selected: any[]) => `Export ${selected.length} records`
+      const action = BulkAction.make('export', 'Export', actionFn)
+        .label(newLabelFn)
+        .build()
+
+      expect(action.label).toBe(newLabelFn)
     })
 
     it('should chain methods', () => {

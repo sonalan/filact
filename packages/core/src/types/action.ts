@@ -75,11 +75,11 @@ export interface BaseActionConfig<TModel extends BaseModel = BaseModel> {
   /** Action identifier */
   id: string
 
-  /** Action label */
-  label: string
+  /** Action label (static or dynamic) */
+  label: string | ((record?: TModel, selected?: TModel[]) => string)
 
-  /** Action icon */
-  icon?: ReactNode
+  /** Action icon (static or dynamic) */
+  icon?: ReactNode | ((record?: TModel, selected?: TModel[]) => ReactNode)
 
   /** Action variant */
   variant?: ActionVariant
@@ -176,11 +176,11 @@ export interface BulkAction<TModel extends BaseModel = BaseModel> {
   /** Action identifier */
   id: string
 
-  /** Action label */
-  label: string
+  /** Action label (static or dynamic) */
+  label: string | ((selected: TModel[]) => string)
 
-  /** Action icon */
-  icon?: ReactNode
+  /** Action icon (static or dynamic) */
+  icon?: ReactNode | ((selected: TModel[]) => ReactNode)
 
   /** Action variant */
   variant?: ActionVariant
