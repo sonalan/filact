@@ -67,6 +67,20 @@ describe('Field Builders', () => {
       expect(typeof field.disabled).toBe('function')
     })
 
+    it('should set readonly', () => {
+      const field = TextInput.make('username').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set readonly with function', () => {
+      const field = TextInput.make('username')
+        .readonly((values) => values.isSubmitted === true)
+        .build()
+
+      expect(typeof field.readonly).toBe('function')
+    })
+
     it('should set visible with function', () => {
       const field = TextInput.make('username')
         .visible((values) => values.showAdvanced === true)
@@ -144,6 +158,12 @@ describe('Field Builders', () => {
       expect(field.step).toBe(1)
     })
 
+    it('should set readonly', () => {
+      const field = NumberInput.make('id').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
     it('should chain methods', () => {
       const field = NumberInput.make('quantity')
         .label('Quantity')
@@ -210,6 +230,12 @@ describe('Field Builders', () => {
       expect(typeof field.options).toBe('function')
     })
 
+    it('should set readonly', () => {
+      const field = Select.make('status').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
     it('should chain methods', () => {
       const field = Select.make('country')
         .label('Country')
@@ -250,6 +276,12 @@ describe('Field Builders', () => {
       const field = Checkbox.make('terms', 'Accept terms').required().build()
 
       expect(field.required).toBe(true)
+    })
+
+    it('should set readonly', () => {
+      const field = Checkbox.make('terms', 'Accept terms').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
     })
 
     it('should chain methods', () => {
@@ -364,6 +396,15 @@ describe('Field Builders', () => {
         .build()
 
       expect(field.disabled).toBe(condition)
+    })
+
+    it('should set readonly', () => {
+      const field = Radio.make('status')
+        .options([{ label: 'Option 1', value: '1' }])
+        .readonly(true)
+        .build()
+
+      expect(field.readonly).toBe(true)
     })
 
     it('should set helper text', () => {
