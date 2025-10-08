@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { RowActionsDropdown } from './RowActionsDropdown'
-import type { ButtonActionConfig } from '../types/action'
+import type { ButtonActionConfig, Action } from '../types/action'
 
 interface TestModel {
   id: number
@@ -373,6 +373,39 @@ describe('RowActionsDropdown', () => {
 
     await waitFor(() => {
       expect(screen.queryByRole('menuitem', { name: 'Edit' })).not.toBeInTheDocument()
+    })
+  })
+
+  it('should render action separator', async () => {
+    const user = userEvent.setup()
+    const actions: Action<TestModel>[] = [
+      {
+        id: 'edit',
+        type: 'button',
+        label: 'Edit',
+        onClick: vi.fn(),
+      },
+      {
+        type: 'separator',
+        id: 'sep-1',
+      },
+      {
+        id: 'delete',
+        type: 'button',
+        label: 'Delete',
+        onClick: vi.fn(),
+      },
+    ]
+
+    render(<RowActionsDropdown record={testRecord} actions={actions} />)
+
+    const button = screen.getByLabelText('Row actions')
+    await user.click(button)
+
+    await waitFor(() => {
+      const separator = screen.getByRole('separator')
+      expect(separator).toBeInTheDocument()
+      expect(separator).toHaveClass('border-t')
     })
   })
 })
