@@ -30,6 +30,9 @@ export interface BaseColumnConfig<TModel extends BaseModel = BaseModel> {
   /** Whether column is sortable */
   sortable?: boolean
 
+  /** Custom sort function */
+  sortFn?: (a: TModel, b: TModel) => number
+
   /** Whether column is searchable */
   searchable?: boolean
 
