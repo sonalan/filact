@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   TextColumn,
   NumberColumn,
@@ -9,6 +9,8 @@ import {
   IconColumn,
   ImageColumn,
   ColorColumn,
+  SelectColumn,
+  ToggleColumn,
   CustomColumn,
 } from './columns'
 
@@ -430,6 +432,111 @@ describe('Column Builders', () => {
       const column = TextColumn.make('name').headerClassName('text-gray-700').build()
 
       expect(column.headerClassName).toBe('text-gray-700')
+    })
+  })
+
+  describe('SelectColumn', () => {
+    it('should create select column', () => {
+      const options = [
+        { value: 'active', label: 'Active' },
+        { value: 'inactive', label: 'Inactive' },
+      ]
+      const onChange = vi.fn()
+      const column = SelectColumn.make('status', options, onChange).label('Status').build()
+
+      expect(column.type).toBe('select')
+      expect(column.accessor).toBe('status')
+      expect(column.label).toBe('Status')
+      expect(column.options).toEqual(options)
+      expect(column.onChange).toBe(onChange)
+    })
+
+    it('should set disabled as boolean', () => {
+      const onChange = vi.fn()
+      const column = SelectColumn.make('status', [], onChange).disabled(true).build()
+
+      expect(column.disabled).toBe(true)
+    })
+
+    it('should set disabled as function', () => {
+      const onChange = vi.fn()
+      const disabledFn = vi.fn()
+      const column = SelectColumn.make('status', [], onChange).disabled(disabledFn).build()
+
+      expect(column.disabled).toBe(disabledFn)
+    })
+
+    it('should set placeholder', () => {
+      const onChange = vi.fn()
+      const column = SelectColumn.make('status', [], onChange)
+        .placeholder('Select status')
+        .build()
+
+      expect(column.placeholder).toBe('Select status')
+    })
+
+    it('should chain methods', () => {
+      const options = [{ value: '1', label: 'Option 1' }]
+      const onChange = vi.fn()
+      const column = SelectColumn.make('field', options, onChange)
+        .label('Field')
+        .placeholder('Choose')
+        .disabled(false)
+        .sortable()
+        .build()
+
+      expect(column.label).toBe('Field')
+      expect(column.placeholder).toBe('Choose')
+      expect(column.disabled).toBe(false)
+      expect(column.sortable).toBe(true)
+    })
+  })
+
+  describe('ToggleColumn', () => {
+    it('should create toggle column', () => {
+      const onChange = vi.fn()
+      const column = ToggleColumn.make('active', onChange).label('Active').build()
+
+      expect(column.type).toBe('toggle')
+      expect(column.accessor).toBe('active')
+      expect(column.label).toBe('Active')
+      expect(column.onChange).toBe(onChange)
+    })
+
+    it('should set disabled as boolean', () => {
+      const onChange = vi.fn()
+      const column = ToggleColumn.make('active', onChange).disabled(true).build()
+
+      expect(column.disabled).toBe(true)
+    })
+
+    it('should set disabled as function', () => {
+      const onChange = vi.fn()
+      const disabledFn = vi.fn()
+      const column = ToggleColumn.make('active', onChange).disabled(disabledFn).build()
+
+      expect(column.disabled).toBe(disabledFn)
+    })
+
+    it('should set toggle label', () => {
+      const onChange = vi.fn()
+      const column = ToggleColumn.make('active', onChange).toggleLabel('Enable').build()
+
+      expect(column.label).toBe('Enable')
+    })
+
+    it('should chain methods', () => {
+      const onChange = vi.fn()
+      const column = ToggleColumn.make('verified', onChange)
+        .label('Verified')
+        .toggleLabel('Verify user')
+        .disabled(false)
+        .sortable()
+        .build()
+
+      expect(column.label).toBe('Verify user')
+      expect(column.disabled).toBe(false)
+      expect(column.sortable).toBe(true)
     })
   })
 })

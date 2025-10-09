@@ -155,6 +155,27 @@ export interface ColorColumnConfig<TModel extends BaseModel = BaseModel> extends
 }
 
 /**
+ * Select column configuration (inline editing)
+ */
+export interface SelectColumnConfig<TModel extends BaseModel = BaseModel> extends BaseColumnConfig<TModel> {
+  type: 'select'
+  options: SelectOption[]
+  onChange: (record: TModel, value: string | number) => void | Promise<void>
+  disabled?: boolean | ((record: TModel) => boolean)
+  placeholder?: string
+}
+
+/**
+ * Toggle column configuration (inline editing)
+ */
+export interface ToggleColumnConfig<TModel extends BaseModel = BaseModel> extends BaseColumnConfig<TModel> {
+  type: 'toggle'
+  onChange: (record: TModel, value: boolean) => void | Promise<void>
+  disabled?: boolean | ((record: TModel) => boolean)
+  label?: string
+}
+
+/**
  * Custom column configuration
  */
 export interface CustomColumnConfig<TModel extends BaseModel = BaseModel> extends BaseColumnConfig<TModel> {
@@ -174,6 +195,8 @@ export type Column<TModel extends BaseModel = BaseModel> =
   | IconColumnConfig<TModel>
   | ImageColumnConfig<TModel>
   | ColorColumnConfig<TModel>
+  | SelectColumnConfig<TModel>
+  | ToggleColumnConfig<TModel>
   | CustomColumnConfig<TModel>
 
 /**
