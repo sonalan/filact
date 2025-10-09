@@ -34,6 +34,37 @@ export class FormBuilder<TModel extends BaseModel = BaseModel> {
   }
 
   /**
+   * Add fields to the form
+   */
+  addFields(...fields: Field[]): this {
+    this.fields.push(...fields)
+    return this
+  }
+
+  /**
+   * Remove a field by name
+   */
+  removeField(name: string): this {
+    this.fields = this.fields.filter((field) => field.name !== name)
+    return this
+  }
+
+  /**
+   * Get a field by name
+   */
+  getField(name: string): Field | undefined {
+    return this.fields.find((field) => field.name === name)
+  }
+
+  /**
+   * Clear all fields
+   */
+  clearFields(): this {
+    this.fields = []
+    return this
+  }
+
+  /**
    * Set the number of columns for grid layout
    */
   grid(columns: number): this {
@@ -47,6 +78,34 @@ export class FormBuilder<TModel extends BaseModel = BaseModel> {
   withSections(sections: FormSection[]): this {
     this.sections = sections
     return this
+  }
+
+  /**
+   * Add a section to the form
+   */
+  addSection(section: FormSection): this {
+    if (!this.sections) {
+      this.sections = []
+    }
+    this.sections.push(section)
+    return this
+  }
+
+  /**
+   * Remove a section by title
+   */
+  removeSection(title: string): this {
+    if (this.sections) {
+      this.sections = this.sections.filter((section) => section.title !== title)
+    }
+    return this
+  }
+
+  /**
+   * Get a section by title
+   */
+  getSection(title: string): FormSection | undefined {
+    return this.sections?.find((section) => section.title === title)
   }
 
   /**
