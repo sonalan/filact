@@ -36,6 +36,19 @@ export function TableHeaderActions({ actions }: TableHeaderActionsProps) {
   return (
     <div className="flex items-center gap-2">
       {actions.map((action) => {
+        // Render separator
+        if (action.type === 'separator') {
+          return (
+            <div
+              key={action.id}
+              className="h-8 w-px bg-gray-300"
+              role="separator"
+              aria-orientation="vertical"
+            />
+          )
+        }
+
+        // Render button
         const isLoading = loadingStates[action.id]
         const isDisabled = action.disabled || isLoading
 
