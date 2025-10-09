@@ -3,6 +3,7 @@
  * Factory functions for creating field configurations
  */
 
+import type { z } from 'zod'
 import type {
   TextFieldConfig,
   NumberFieldConfig,
@@ -84,6 +85,11 @@ export class TextInputBuilder {
 
   columnSpan(span: number): this {
     this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
     return this
   }
 
@@ -193,6 +199,11 @@ export class NumberInputBuilder {
     return this
   }
 
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
   build(): NumberFieldConfig {
     if (!this.config.name) {
       throw new Error('Field name is required')
@@ -278,6 +289,11 @@ export class SelectBuilder {
     return this
   }
 
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
   build(): SelectFieldConfig {
     if (!this.config.name) {
       throw new Error('Field name is required')
@@ -333,6 +349,11 @@ export class CheckboxBuilder {
 
   columnSpan(span: number): this {
     this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
     return this
   }
 
@@ -415,6 +436,11 @@ export class RadioBuilder {
 
   columnSpan(span: number): this {
     this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
     return this
   }
 

@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { z } from 'zod'
 import {
   TextInput,
   EmailInput,
@@ -445,6 +446,84 @@ describe('Field Builders', () => {
       const builder = Radio.make('status').options([])
 
       expect(() => builder.build()).toThrow('Radio field must have at least one option')
+    })
+  })
+
+  describe('Validation', () => {
+    it('should set validation schema on TextInput', () => {
+      const schema = z.string().min(3).max(20)
+      const field = TextInput.make('username').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should set validation schema on NumberInput', () => {
+      const schema = z.number().min(0).max(100)
+      const field = NumberInput.make('age').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should set validation schema on Select', () => {
+      const schema = z.string().min(1)
+      const field = Select.make('role')
+        .options([
+          { value: 'admin', label: 'Admin' },
+          { value: 'user', label: 'User' },
+        ])
+        .validate(schema)
+        .build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should set validation schema on Checkbox', () => {
+      const schema = z.boolean().refine((val) => val === true)
+      const field = Checkbox.make('terms', 'Accept Terms').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should set validation schema on Radio', () => {
+      const schema = z.string().min(1)
+      const field = Radio.make('size')
+        .options([
+          { value: 's', label: 'Small' },
+          { value: 'm', label: 'Medium' },
+        ])
+        .validate(schema)
+        .build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should support async validation with Zod', () => {
+      const asyncSchema = z.string().refine(
+        async (val) => {
+          // Simulate API call
+          return val !== 'taken'
+        },
+        { message: 'Username is already taken' }
+      )
+
+      const field = TextInput.make('username').validate(asyncSchema).build()
+
+      expect(field.validation).toBe(asyncSchema)
+    })
+
+    it('should chain validate with other methods', () => {
+      const schema = z.string().email()
+      const field = EmailInput.make('email')
+        .label('Email Address')
+        .required()
+        .validate(schema)
+        .placeholder('you@example.com')
+        .build()
+
+      expect(field.validation).toBe(schema)
+      expect(field.label).toBe('Email Address')
+      expect(field.required).toBe(true)
+      expect(field.placeholder).toBe('you@example.com')
     })
   })
 })
