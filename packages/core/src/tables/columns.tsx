@@ -14,8 +14,11 @@ import type {
   IconColumnConfig,
   ImageColumnConfig,
   ColorColumnConfig,
+  SelectColumnConfig,
+  ToggleColumnConfig,
   CustomColumnConfig,
   ColumnAlignment,
+  SelectOption,
 } from '../types/table'
 
 /**
@@ -369,6 +372,70 @@ export class ColorColumnBuilder<TModel extends BaseModel = BaseModel> extends Ba
 }
 
 /**
+ * Select column builder (inline editing)
+ */
+export class SelectColumnBuilder<TModel extends BaseModel = BaseModel> extends BaseColumnBuilder<
+  SelectColumnConfig<TModel>,
+  TModel
+> {
+  constructor(
+    accessor: keyof TModel | string,
+    options: SelectOption[],
+    onChange: (record: TModel, value: string | number) => void | Promise<void>
+  ) {
+    super(accessor)
+    ;(this.config as any).type = 'select'
+    ;(this.config as any).options = options
+    ;(this.config as any).onChange = onChange
+  }
+
+  disabled(disabled: boolean | ((record: TModel) => boolean)): this {
+    ;(this.config as any).disabled = disabled
+    return this
+  }
+
+  placeholder(placeholder: string): this {
+    ;(this.config as any).placeholder = placeholder
+    return this
+  }
+
+  build(): SelectColumnConfig<TModel> {
+    return this.config as SelectColumnConfig<TModel>
+  }
+}
+
+/**
+ * Toggle column builder (inline editing)
+ */
+export class ToggleColumnBuilder<TModel extends BaseModel = BaseModel> extends BaseColumnBuilder<
+  ToggleColumnConfig<TModel>,
+  TModel
+> {
+  constructor(
+    accessor: keyof TModel | string,
+    onChange: (record: TModel, value: boolean) => void | Promise<void>
+  ) {
+    super(accessor)
+    ;(this.config as any).type = 'toggle'
+    ;(this.config as any).onChange = onChange
+  }
+
+  disabled(disabled: boolean | ((record: TModel) => boolean)): this {
+    ;(this.config as any).disabled = disabled
+    return this
+  }
+
+  toggleLabel(label: string): this {
+    ;(this.config as any).label = label
+    return this
+  }
+
+  build(): ToggleColumnConfig<TModel> {
+    return this.config as ToggleColumnConfig<TModel>
+  }
+}
+
+/**
  * Custom column builder
  */
 export class CustomColumnBuilder<TModel extends BaseModel = BaseModel> extends BaseColumnBuilder<
@@ -434,6 +501,21 @@ export const ImageColumn = {
 export const ColorColumn = {
   make: <TModel extends BaseModel = BaseModel>(accessor: keyof TModel | string) =>
     new ColorColumnBuilder<TModel>(accessor),
+}
+
+export const SelectColumn = {
+  make: <TModel extends BaseModel = BaseModel>(
+    accessor: keyof TModel | string,
+    options: SelectOption[],
+    onChange: (record: TModel, value: string | number) => void | Promise<void>
+  ) => new SelectColumnBuilder<TModel>(accessor, options, onChange),
+}
+
+export const ToggleColumn = {
+  make: <TModel extends BaseModel = BaseModel>(
+    accessor: keyof TModel | string,
+    onChange: (record: TModel, value: boolean) => void | Promise<void>
+  ) => new ToggleColumnBuilder<TModel>(accessor, onChange),
 }
 
 export const CustomColumn = {
