@@ -10,7 +10,7 @@ export interface TableSearchProps {
   value?: string
 
   /** Search change handler */
-  onSearch: (query: string) => void
+  onSearch: (query: string, searchColumns?: string[]) => void
 
   /** Debounce delay in milliseconds */
   debounceMs?: number
@@ -26,6 +26,12 @@ export interface TableSearchProps {
 
   /** Custom className */
   className?: string
+
+  /** Columns to search across (column accessors) */
+  searchColumns?: string[]
+
+  /** Show column selector for multi-column search */
+  showColumnSelector?: boolean
 }
 
 /**
@@ -40,14 +46,22 @@ export function TableSearch({
   disabled = false,
   showClear = true,
   className = '',
+  searchColumns = [],
+  showColumnSelector = false,
 }: TableSearchProps) {
   const [inputValue, setInputValue] = useState(value)
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(searchColumns)
   const timeoutRef = useRef<NodeJS.Timeout>()
 
   // Sync with external value changes
   useEffect(() => {
     setInputValue(value)
   }, [value])
+
+  // Sync selected columns with searchColumns prop
+  useEffect(() => {
+    setSelectedColumns(searchColumns)
+  }, [searchColumns])
 
   // Handle input change with debouncing
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,18 +75,32 @@ export function TableSearch({
 
     // Set new timeout for debounced search
     timeoutRef.current = setTimeout(() => {
-      onSearch(newValue)
+      onSearch(newValue, selectedColumns.length > 0 ? selectedColumns : undefined)
     }, debounceMs)
   }
 
   // Handle clear
   const handleClear = () => {
     setInputValue('')
-    onSearch('')
+    onSearch('', selectedColumns.length > 0 ? selectedColumns : undefined)
 
     // Clear any pending timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
+    }
+  }
+
+  // Handle column selection change
+  const handleColumnToggle = (column: string) => {
+    const newColumns = selectedColumns.includes(column)
+      ? selectedColumns.filter((c) => c !== column)
+      : [...selectedColumns, column]
+
+    setSelectedColumns(newColumns)
+
+    // Re-trigger search with new column selection if there's a search value
+    if (inputValue) {
+      onSearch(inputValue, newColumns.length > 0 ? newColumns : undefined)
     }
   }
 
@@ -139,6 +167,27 @@ export function TableSearch({
           </button>
         )}
       </div>
+
+      {/* Column Selector */}
+      {showColumnSelector && searchColumns.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {searchColumns.map((column) => (
+            <button
+              key={column}
+              type="button"
+              onClick={() => handleColumnToggle(column)}
+              className={`px-3 py-1 text-sm rounded-full border ${
+                selectedColumns.includes(column)
+                  ? 'bg-blue-50 border-blue-500 text-blue-700'
+                  : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+              }`}
+              aria-pressed={selectedColumns.includes(column)}
+            >
+              {column}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
