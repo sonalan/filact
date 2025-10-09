@@ -314,3 +314,199 @@ describe('useTableSearch', () => {
     expect(result.current.debouncedQuery).toBe('test')
   })
 })
+
+describe('TableSearch - Multi-Column Search', () => {
+  afterEach(() => {
+    vi.clearAllTimers()
+    vi.useRealTimers()
+  })
+
+  it('should pass searchColumns to onSearch callback', async () => {
+    vi.useFakeTimers()
+    const onSearch = vi.fn()
+    const searchColumns = ['name', 'email', 'role']
+
+    render(<TableSearch onSearch={onSearch} searchColumns={searchColumns} />)
+
+    const input = screen.getByLabelText('Search')
+
+    act(() => {
+      fireEvent.change(input, { target: { value: 'test' } })
+    })
+
+    await act(async () => {
+      vi.advanceTimersByTime(300)
+    })
+
+    expect(onSearch).toHaveBeenCalledWith('test', searchColumns)
+  })
+
+  it('should render column selector when showColumnSelector is true', () => {
+    const searchColumns = ['name', 'email', 'role']
+
+    render(
+      <TableSearch
+        onSearch={vi.fn()}
+        searchColumns={searchColumns}
+        showColumnSelector={true}
+      />
+    )
+
+    expect(screen.getByText('name')).toBeInTheDocument()
+    expect(screen.getByText('email')).toBeInTheDocument()
+    expect(screen.getByText('role')).toBeInTheDocument()
+  })
+
+  it('should not render column selector when showColumnSelector is false', () => {
+    const searchColumns = ['name', 'email']
+
+    render(
+      <TableSearch
+        onSearch={vi.fn()}
+        searchColumns={searchColumns}
+        showColumnSelector={false}
+      />
+    )
+
+    expect(screen.queryByText('name')).not.toBeInTheDocument()
+    expect(screen.queryByText('email')).not.toBeInTheDocument()
+  })
+
+  it('should toggle column selection', async () => {
+    vi.useFakeTimers()
+    const onSearch = vi.fn()
+    const user = userEvent.setup({ delay: null })
+    const searchColumns = ['name', 'email']
+
+    render(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={searchColumns}
+        showColumnSelector={true}
+        value="test"
+      />
+    )
+
+    const nameButton = screen.getByText('name')
+    const emailButton = screen.getByText('email')
+
+    // Initially all columns selected
+    expect(nameButton).toHaveClass('bg-blue-50')
+    expect(emailButton).toHaveClass('bg-blue-50')
+
+    // Click name to deselect
+    await user.click(nameButton)
+
+    expect(nameButton).toHaveClass('bg-white')
+    expect(onSearch).toHaveBeenCalledWith('test', ['email'])
+
+    // Click name again to reselect
+    await user.click(nameButton)
+
+    expect(nameButton).toHaveClass('bg-blue-50')
+    expect(onSearch).toHaveBeenCalledWith('test', ['email', 'name'])
+  })
+
+  it('should pass undefined when no columns selected', async () => {
+    vi.useFakeTimers()
+    const onSearch = vi.fn()
+    const user = userEvent.setup({ delay: null })
+    const searchColumns = ['name']
+
+    render(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={searchColumns}
+        showColumnSelector={true}
+        value="test"
+      />
+    )
+
+    const nameButton = screen.getByText('name')
+
+    // Deselect the only column
+    await user.click(nameButton)
+
+    expect(onSearch).toHaveBeenCalledWith('test', undefined)
+  })
+
+  it('should re-trigger search when column selection changes', async () => {
+    vi.useFakeTimers()
+    const onSearch = vi.fn()
+    const user = userEvent.setup({ delay: null })
+    const searchColumns = ['name', 'email']
+
+    render(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={searchColumns}
+        showColumnSelector={true}
+      />
+    )
+
+    const input = screen.getByLabelText('Search')
+
+    // Type in search
+    act(() => {
+      fireEvent.change(input, { target: { value: 'test' } })
+    })
+
+    await act(async () => {
+      vi.advanceTimersByTime(300)
+    })
+
+    expect(onSearch).toHaveBeenCalledWith('test', searchColumns)
+    onSearch.mockClear()
+
+    // Toggle column
+    const nameButton = screen.getByText('name')
+    await user.click(nameButton)
+
+    expect(onSearch).toHaveBeenCalledWith('test', ['email'])
+  })
+
+  it('should not trigger search on column toggle when no search value', async () => {
+    const onSearch = vi.fn()
+    const user = userEvent.setup({ delay: null })
+    const searchColumns = ['name', 'email']
+
+    render(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={searchColumns}
+        showColumnSelector={true}
+      />
+    )
+
+    const nameButton = screen.getByText('name')
+    await user.click(nameButton)
+
+    // onSearch should not be called since there's no search value
+    expect(onSearch).not.toHaveBeenCalled()
+  })
+
+  it('should sync selected columns with searchColumns prop changes', () => {
+    const onSearch = vi.fn()
+    const { rerender } = render(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={['name']}
+        showColumnSelector={true}
+      />
+    )
+
+    expect(screen.getByText('name')).toBeInTheDocument()
+    expect(screen.queryByText('email')).not.toBeInTheDocument()
+
+    rerender(
+      <TableSearch
+        onSearch={onSearch}
+        searchColumns={['name', 'email']}
+        showColumnSelector={true}
+      />
+    )
+
+    expect(screen.getByText('name')).toBeInTheDocument()
+    expect(screen.getByText('email')).toBeInTheDocument()
+  })
+})
