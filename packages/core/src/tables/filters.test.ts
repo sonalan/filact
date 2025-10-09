@@ -10,6 +10,35 @@ import {
 } from './filters'
 
 describe('Filter Builders', () => {
+  describe('Base Filter Methods', () => {
+    it('should set placeholder', () => {
+      const filter = TextFilter.make('search')
+        .label('Search')
+        .placeholder('Enter search term...')
+        .build()
+
+      expect(filter.placeholder).toBe('Enter search term...')
+    })
+
+    it('should set disabled', () => {
+      const filter = TextFilter.make('search')
+        .label('Search')
+        .disabled()
+        .build()
+
+      expect(filter.disabled).toBe(true)
+    })
+
+    it('should set disabled with explicit value', () => {
+      const filter = TextFilter.make('search')
+        .label('Search')
+        .disabled(false)
+        .build()
+
+      expect(filter.disabled).toBe(false)
+    })
+  })
+
   describe('TextFilter', () => {
     it('should create text filter', () => {
       const filter = TextFilter.make('search').label('Search').build()
@@ -127,6 +156,37 @@ describe('Filter Builders', () => {
       const filter = NumberFilter.make('age').label('Age').default(18).build()
 
       expect(filter.default).toBe(18)
+    })
+
+    it('should set min value', () => {
+      const filter = NumberFilter.make('age').label('Age').min(18).build()
+
+      expect(filter.min).toBe(18)
+    })
+
+    it('should set max value', () => {
+      const filter = NumberFilter.make('age').label('Age').max(100).build()
+
+      expect(filter.max).toBe(100)
+    })
+
+    it('should set step value', () => {
+      const filter = NumberFilter.make('price').label('Price').step(0.01).build()
+
+      expect(filter.step).toBe(0.01)
+    })
+
+    it('should chain min, max, and step', () => {
+      const filter = NumberFilter.make('age')
+        .label('Age')
+        .min(18)
+        .max(100)
+        .step(1)
+        .build()
+
+      expect(filter.min).toBe(18)
+      expect(filter.max).toBe(100)
+      expect(filter.step).toBe(1)
     })
   })
 
