@@ -11,6 +11,7 @@ import {
   ColorColumn,
   SelectColumn,
   ToggleColumn,
+  RelationshipColumn,
   CustomColumn,
 } from './columns'
 
@@ -536,6 +537,58 @@ describe('Column Builders', () => {
 
       expect(column.label).toBe('Verify user')
       expect(column.disabled).toBe(false)
+      expect(column.sortable).toBe(true)
+    })
+  })
+
+  describe('RelationshipColumn', () => {
+    it('should create relationship column', () => {
+      const column = RelationshipColumn.make('user', 'user', 'name').label('User').build()
+
+      expect(column.type).toBe('relationship')
+      expect(column.accessor).toBe('user')
+      expect(column.label).toBe('User')
+      expect(column.relationship).toBe('user')
+      expect(column.displayField).toBe('name')
+    })
+
+    it('should set fallback text', () => {
+      const column = RelationshipColumn.make('category', 'category', 'name')
+        .fallback('No category')
+        .build()
+
+      expect(column.fallback).toBe('No category')
+    })
+
+    it('should set separator for multiple items', () => {
+      const column = RelationshipColumn.make('tags', 'tags', 'name')
+        .separator(', ')
+        .build()
+
+      expect(column.separator).toBe(', ')
+    })
+
+    it('should set max items', () => {
+      const column = RelationshipColumn.make('tags', 'tags', 'name')
+        .maxItems(3)
+        .build()
+
+      expect(column.maxItems).toBe(3)
+    })
+
+    it('should chain methods', () => {
+      const column = RelationshipColumn.make('roles', 'roles', 'name')
+        .label('Roles')
+        .separator(' | ')
+        .maxItems(5)
+        .fallback('No roles')
+        .sortable()
+        .build()
+
+      expect(column.label).toBe('Roles')
+      expect(column.separator).toBe(' | ')
+      expect(column.maxItems).toBe(5)
+      expect(column.fallback).toBe('No roles')
       expect(column.sortable).toBe(true)
     })
   })
