@@ -29,6 +29,16 @@ class BaseFilterBuilder<T extends FilterType> {
     return this
   }
 
+  placeholder(placeholder: string): this {
+    this.config.placeholder = placeholder
+    return this
+  }
+
+  disabled(disabled = true): this {
+    this.config.disabled = disabled
+    return this
+  }
+
   build(): Filter {
     if (!this.config.label) {
       throw new Error('Filter label is required')
@@ -92,6 +102,21 @@ export class DateRangeFilterBuilder extends BaseFilterBuilder<'daterange'> {
 export class NumberFilterBuilder extends BaseFilterBuilder<'number'> {
   constructor(name: string) {
     super(name, 'number')
+  }
+
+  min(min: number): this {
+    this.config.min = min
+    return this
+  }
+
+  max(max: number): this {
+    this.config.max = max
+    return this
+  }
+
+  step(step: number): this {
+    this.config.step = step
+    return this
   }
 }
 
