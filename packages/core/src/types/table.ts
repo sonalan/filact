@@ -176,6 +176,18 @@ export interface ToggleColumnConfig<TModel extends BaseModel = BaseModel> extend
 }
 
 /**
+ * Relationship column configuration (nested data)
+ */
+export interface RelationshipColumnConfig<TModel extends BaseModel = BaseModel> extends BaseColumnConfig<TModel> {
+  type: 'relationship'
+  relationship: string
+  displayField: string
+  fallback?: string
+  separator?: string
+  maxItems?: number
+}
+
+/**
  * Custom column configuration
  */
 export interface CustomColumnConfig<TModel extends BaseModel = BaseModel> extends BaseColumnConfig<TModel> {
@@ -197,6 +209,7 @@ export type Column<TModel extends BaseModel = BaseModel> =
   | ColorColumnConfig<TModel>
   | SelectColumnConfig<TModel>
   | ToggleColumnConfig<TModel>
+  | RelationshipColumnConfig<TModel>
   | CustomColumnConfig<TModel>
 
 /**

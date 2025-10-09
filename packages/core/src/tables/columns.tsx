@@ -16,6 +16,7 @@ import type {
   ColorColumnConfig,
   SelectColumnConfig,
   ToggleColumnConfig,
+  RelationshipColumnConfig,
   CustomColumnConfig,
   ColumnAlignment,
   SelectOption,
@@ -436,6 +437,44 @@ export class ToggleColumnBuilder<TModel extends BaseModel = BaseModel> extends B
 }
 
 /**
+ * Relationship column builder (nested data)
+ */
+export class RelationshipColumnBuilder<TModel extends BaseModel = BaseModel> extends BaseColumnBuilder<
+  RelationshipColumnConfig<TModel>,
+  TModel
+> {
+  constructor(
+    accessor: keyof TModel | string,
+    relationship: string,
+    displayField: string
+  ) {
+    super(accessor)
+    ;(this.config as any).type = 'relationship'
+    ;(this.config as any).relationship = relationship
+    ;(this.config as any).displayField = displayField
+  }
+
+  fallback(fallback: string): this {
+    ;(this.config as any).fallback = fallback
+    return this
+  }
+
+  separator(separator: string): this {
+    ;(this.config as any).separator = separator
+    return this
+  }
+
+  maxItems(max: number): this {
+    ;(this.config as any).maxItems = max
+    return this
+  }
+
+  build(): RelationshipColumnConfig<TModel> {
+    return this.config as RelationshipColumnConfig<TModel>
+  }
+}
+
+/**
  * Custom column builder
  */
 export class CustomColumnBuilder<TModel extends BaseModel = BaseModel> extends BaseColumnBuilder<
@@ -516,6 +555,14 @@ export const ToggleColumn = {
     accessor: keyof TModel | string,
     onChange: (record: TModel, value: boolean) => void | Promise<void>
   ) => new ToggleColumnBuilder<TModel>(accessor, onChange),
+}
+
+export const RelationshipColumn = {
+  make: <TModel extends BaseModel = BaseModel>(
+    accessor: keyof TModel | string,
+    relationship: string,
+    displayField: string
+  ) => new RelationshipColumnBuilder<TModel>(accessor, relationship, displayField),
 }
 
 export const CustomColumn = {
