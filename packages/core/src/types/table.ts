@@ -247,9 +247,12 @@ export interface PaginationConfig {
 }
 
 /**
- * Table header action
+ * Table header action button
  */
-export interface TableHeaderAction {
+export interface TableHeaderActionButton {
+  /** Action type */
+  type?: 'button'
+
   /** Action identifier */
   id: string
 
@@ -274,6 +277,22 @@ export interface TableHeaderAction {
   /** Custom CSS class */
   className?: string
 }
+
+/**
+ * Table header action separator
+ */
+export interface TableHeaderActionSeparator {
+  /** Separator type */
+  type: 'separator'
+
+  /** Separator identifier */
+  id: string
+}
+
+/**
+ * Table header action (button or separator)
+ */
+export type TableHeaderAction = TableHeaderActionButton | TableHeaderActionSeparator
 
 /**
  * Table schema - the complete table definition

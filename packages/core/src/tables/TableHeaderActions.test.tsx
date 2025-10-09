@@ -283,4 +283,94 @@ describe('TableHeaderActions', () => {
     expect(screen.getByRole('button', { name: 'Import' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
   })
+
+  it('should render separator', () => {
+    const actions: TableHeaderAction[] = [
+      {
+        id: 'create',
+        label: 'Create',
+        onClick: vi.fn(),
+      },
+      {
+        type: 'separator',
+        id: 'sep1',
+      },
+      {
+        id: 'export',
+        label: 'Export',
+        onClick: vi.fn(),
+      },
+    ]
+
+    render(<TableHeaderActions actions={actions} />)
+
+    const separator = screen.getByRole('separator')
+    expect(separator).toBeInTheDocument()
+    expect(separator).toHaveClass('bg-gray-300')
+  })
+
+  it('should render multiple separators', () => {
+    const actions: TableHeaderAction[] = [
+      {
+        id: 'create',
+        label: 'Create',
+        onClick: vi.fn(),
+      },
+      {
+        type: 'separator',
+        id: 'sep1',
+      },
+      {
+        id: 'import',
+        label: 'Import',
+        onClick: vi.fn(),
+      },
+      {
+        type: 'separator',
+        id: 'sep2',
+      },
+      {
+        id: 'export',
+        label: 'Export',
+        onClick: vi.fn(),
+      },
+    ]
+
+    const { container } = render(<TableHeaderActions actions={actions} />)
+
+    const separators = container.querySelectorAll('[role="separator"]')
+    expect(separators).toHaveLength(2)
+  })
+
+  it('should render actions and separators together', () => {
+    const actions: TableHeaderAction[] = [
+      {
+        id: 'create',
+        label: 'Create',
+        onClick: vi.fn(),
+        variant: 'primary',
+      },
+      {
+        type: 'separator',
+        id: 'sep1',
+      },
+      {
+        id: 'import',
+        label: 'Import',
+        onClick: vi.fn(),
+      },
+      {
+        id: 'export',
+        label: 'Export',
+        onClick: vi.fn(),
+      },
+    ]
+
+    const { container } = render(<TableHeaderActions actions={actions} />)
+
+    expect(screen.getByRole('button', { name: 'Create' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Import' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument()
+    expect(container.querySelector('[role="separator"]')).toBeInTheDocument()
+  })
 })
