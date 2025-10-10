@@ -46,6 +46,12 @@ export interface ModalConfig {
 
   /** Close modal on success */
   closeOnSuccess?: boolean
+
+  /** Allow nested modals (z-index management) */
+  allowNested?: boolean
+
+  /** Parent modal ID (for nested modals) */
+  parentModalId?: string
 }
 
 /**
