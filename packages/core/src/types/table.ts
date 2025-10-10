@@ -47,6 +47,12 @@ export interface BaseColumnConfig<TModel extends BaseModel = BaseModel> {
 
   /** Custom header CSS class */
   headerClassName?: string
+
+  /** Enable search highlighting in this column */
+  highlightSearch?: boolean
+
+  /** Custom highlight className */
+  highlightClassName?: string
 }
 
 /**
