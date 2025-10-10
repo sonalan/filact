@@ -13,6 +13,7 @@ import type {
   RadioFieldConfig,
   DateFieldConfig,
   FileFieldConfig,
+  SliderFieldConfig,
 } from '../types'
 
 /**
@@ -492,4 +493,117 @@ export const Switch = {
 
 export const Radio = {
   make: (name: string) => new RadioBuilder(name),
+}
+
+/**
+ * Slider field builder
+ */
+export class SliderBuilder {
+  private config: Partial<SliderFieldConfig> = {
+    type: 'slider',
+    name: '',
+    min: 0,
+    max: 100,
+    step: 1,
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  min(min: number): this {
+    this.config.min = min
+    return this
+  }
+
+  max(max: number): this {
+    this.config.max = max
+    return this
+  }
+
+  step(step: number): this {
+    this.config.step = step
+    return this
+  }
+
+  showValue(show = true): this {
+    this.config.showValue = show
+    return this
+  }
+
+  showMarks(show = true): this {
+    this.config.showMarks = show
+    return this
+  }
+
+  marks(marks: Array<{ value: number; label?: string }>): this {
+    this.config.marks = marks
+    return this
+  }
+
+  prefix(prefix: React.ReactNode): this {
+    this.config.prefix = prefix
+    return this
+  }
+
+  suffix(suffix: React.ReactNode): this {
+    this.config.suffix = suffix
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: number): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): SliderFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    return this.config as SliderFieldConfig
+  }
+}
+
+export const Slider = {
+  make: (name: string) => new SliderBuilder(name),
 }
