@@ -124,6 +124,71 @@ export interface ResourceLifecycleHooks<TModel extends BaseModel = BaseModel> {
 }
 
 /**
+ * Routing configuration for resource pages
+ */
+export interface RoutingConfig {
+  /** Base path for the resource (e.g., '/users') */
+  basePath?: string
+
+  /** Custom route for list page */
+  listPath?: string
+
+  /** Custom route for create page */
+  createPath?: string
+
+  /** Custom route for edit page (use :id as placeholder) */
+  editPath?: string
+
+  /** Custom route for view page (use :id as placeholder) */
+  viewPath?: string
+
+  /** Whether to generate routes automatically */
+  autoGenerate?: boolean
+
+  /** Custom route parameter name (default: 'id') */
+  paramName?: string
+}
+
+/**
+ * Page metadata configuration
+ */
+export interface PageMetadata {
+  /** Page title template (use {name} for resource name, {id} for record id) */
+  title?: string
+
+  /** Page description */
+  description?: string
+
+  /** Custom meta tags */
+  meta?: Record<string, string>
+
+  /** Custom OpenGraph metadata */
+  og?: {
+    title?: string
+    description?: string
+    image?: string
+    type?: string
+  }
+}
+
+/**
+ * Resource page metadata
+ */
+export interface ResourcePageMetadata {
+  /** List page metadata */
+  list?: PageMetadata
+
+  /** Create page metadata */
+  create?: PageMetadata
+
+  /** Edit page metadata */
+  edit?: PageMetadata
+
+  /** View page metadata */
+  view?: PageMetadata
+}
+
+/**
  * Resource metadata
  */
 export interface ResourceMetadata {
@@ -135,6 +200,12 @@ export interface ResourceMetadata {
 
   /** Resource description */
   description?: string
+
+  /** Routing configuration */
+  routing?: RoutingConfig
+
+  /** Page metadata */
+  pageMetadata?: ResourcePageMetadata
 
   /** Custom metadata */
   [key: string]: unknown
