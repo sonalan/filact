@@ -195,6 +195,21 @@ export interface RelationshipFieldConfig extends BaseFieldConfig {
 }
 
 /**
+ * Slider field configuration
+ */
+export interface SliderFieldConfig extends BaseFieldConfig {
+  type: 'slider'
+  min?: number
+  max?: number
+  step?: number
+  showValue?: boolean
+  showMarks?: boolean
+  marks?: Array<{ value: number; label?: string }>
+  prefix?: ReactNode
+  suffix?: ReactNode
+}
+
+/**
  * Custom field configuration
  */
 export interface CustomFieldConfig extends BaseFieldConfig {
@@ -218,6 +233,7 @@ export type Field =
   | RadioFieldConfig
   | DateFieldConfig
   | FileFieldConfig
+  | SliderFieldConfig
   | RepeaterFieldConfig
   | RelationshipFieldConfig
   | CustomFieldConfig
