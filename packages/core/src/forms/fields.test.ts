@@ -16,6 +16,7 @@ import {
   FileUpload,
   ImageUpload,
   Repeater,
+  Relationship,
 } from './fields'
 
 describe('Field Builders', () => {
@@ -1330,6 +1331,242 @@ describe('Field Builders', () => {
 
       expect(field.fields).toHaveLength(2)
       expect(field.fields[1].type).toBe('repeater')
+    })
+  })
+
+  describe('Relationship', () => {
+    it('should create relationship field', () => {
+      const field = Relationship.make('author', 'users')
+        .label('Author')
+        .build()
+
+      expect(field.type).toBe('relationship')
+      expect(field.name).toBe('author')
+      expect(field.resource).toBe('users')
+      expect(field.label).toBe('Author')
+    })
+
+    it('should set placeholder', () => {
+      const field = Relationship.make('author', 'users')
+        .placeholder('Select author')
+        .build()
+
+      expect(field.placeholder).toBe('Select author')
+    })
+
+    it('should set display field', () => {
+      const field = Relationship.make('author', 'users')
+        .displayField('name')
+        .build()
+
+      expect(field.displayField).toBe('name')
+    })
+
+    it('should set searchable', () => {
+      const field = Relationship.make('author', 'users')
+        .searchable()
+        .build()
+
+      expect(field.searchable).toBe(true)
+    })
+
+    it('should set createable', () => {
+      const field = Relationship.make('author', 'users')
+        .createable()
+        .build()
+
+      expect(field.createable).toBe(true)
+    })
+
+    it('should set multiple', () => {
+      const field = Relationship.make('tags', 'tags')
+        .multiple()
+        .build()
+
+      expect(field.multiple).toBe(true)
+    })
+
+    it('should set preload', () => {
+      const field = Relationship.make('category', 'categories')
+        .preload()
+        .build()
+
+      expect(field.preload).toBe(true)
+    })
+
+    it('should set required', () => {
+      const field = Relationship.make('author', 'users')
+        .required()
+        .build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set disabled', () => {
+      const field = Relationship.make('author', 'users')
+        .disabled(true)
+        .build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set readonly', () => {
+      const field = Relationship.make('author', 'users')
+        .readonly(true)
+        .build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set visible', () => {
+      const field = Relationship.make('author', 'users')
+        .visible(false)
+        .build()
+
+      expect(field.visible).toBe(false)
+    })
+
+    it('should set helper text', () => {
+      const field = Relationship.make('author', 'users')
+        .helperText('Select the post author')
+        .build()
+
+      expect(field.helperText).toBe('Select the post author')
+    })
+
+    it('should set default value', () => {
+      const field = Relationship.make('author', 'users')
+        .default(1)
+        .build()
+
+      expect(field.default).toBe(1)
+    })
+
+    it('should set column span', () => {
+      const field = Relationship.make('author', 'users')
+        .columnSpan(2)
+        .build()
+
+      expect(field.columnSpan).toBe(2)
+    })
+
+    it('should set validation', () => {
+      const schema = z.number()
+      const field = Relationship.make('author', 'users')
+        .validate(schema)
+        .build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should support conditional disabled', () => {
+      const disabledFn = (values: Record<string, unknown>) => values.locked === true
+      const field = Relationship.make('author', 'users')
+        .disabled(disabledFn)
+        .build()
+
+      expect(field.disabled).toBe(disabledFn)
+    })
+
+    it('should support conditional readonly', () => {
+      const readonlyFn = (values: Record<string, unknown>) => values.published === true
+      const field = Relationship.make('author', 'users')
+        .readonly(readonlyFn)
+        .build()
+
+      expect(field.readonly).toBe(readonlyFn)
+    })
+
+    it('should support conditional visible', () => {
+      const visibleFn = (values: Record<string, unknown>) => values.type === 'post'
+      const field = Relationship.make('author', 'users')
+        .visible(visibleFn)
+        .build()
+
+      expect(field.visible).toBe(visibleFn)
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = Relationship.make('', 'users')
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should throw error if resource is missing', () => {
+      const builder = Relationship.make('author', '')
+      expect(() => builder.build()).toThrow('Resource name is required')
+    })
+
+    it('should create belongs-to relationship', () => {
+      const field = Relationship.make('author', 'users')
+        .label('Author')
+        .displayField('name')
+        .searchable()
+        .required()
+        .build()
+
+      expect(field.type).toBe('relationship')
+      expect(field.name).toBe('author')
+      expect(field.resource).toBe('users')
+      expect(field.multiple).toBeUndefined()
+    })
+
+    it('should create many-to-many relationship', () => {
+      const field = Relationship.make('tags', 'tags')
+        .label('Tags')
+        .multiple()
+        .searchable()
+        .createable()
+        .build()
+
+      expect(field.type).toBe('relationship')
+      expect(field.name).toBe('tags')
+      expect(field.resource).toBe('tags')
+      expect(field.multiple).toBe(true)
+    })
+
+    it('should support preloading for small datasets', () => {
+      const field = Relationship.make('category', 'categories')
+        .label('Category')
+        .preload()
+        .displayField('name')
+        .build()
+
+      expect(field.preload).toBe(true)
+    })
+
+    it('should support searchable and createable together', () => {
+      const field = Relationship.make('tags', 'tags')
+        .searchable()
+        .createable()
+        .multiple()
+        .build()
+
+      expect(field.searchable).toBe(true)
+      expect(field.createable).toBe(true)
+    })
+
+    it('should chain all configuration methods', () => {
+      const field = Relationship.make('author', 'users')
+        .label('Author')
+        .placeholder('Select an author')
+        .displayField('name')
+        .searchable()
+        .createable()
+        .preload()
+        .required()
+        .helperText('The author of this post')
+        .columnSpan(2)
+        .build()
+
+      expect(field.label).toBe('Author')
+      expect(field.placeholder).toBe('Select an author')
+      expect(field.displayField).toBe('name')
+      expect(field.searchable).toBe(true)
+      expect(field.createable).toBe(true)
+      expect(field.preload).toBe(true)
+      expect(field.required).toBe(true)
+      expect(field.helperText).toBe('The author of this post')
+      expect(field.columnSpan).toBe(2)
     })
   })
 })

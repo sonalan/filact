@@ -16,6 +16,7 @@ import type {
   FileFieldConfig,
   SliderFieldConfig,
   RepeaterFieldConfig,
+  RelationshipFieldConfig,
   Field,
 } from '../types'
 
@@ -1033,4 +1034,109 @@ export class RepeaterBuilder {
 
 export const Repeater = {
   make: (name: string) => new RepeaterBuilder(name),
+}
+
+/**
+ * Relationship field builder
+ */
+export class RelationshipBuilder {
+  private config: Partial<RelationshipFieldConfig> = {
+    type: 'relationship',
+    name: '',
+    resource: '',
+  }
+
+  constructor(name: string, resource: string) {
+    this.config.name = name
+    this.config.resource = resource
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  placeholder(placeholder: string): this {
+    this.config.placeholder = placeholder
+    return this
+  }
+
+  displayField(field: string): this {
+    this.config.displayField = field
+    return this
+  }
+
+  searchable(searchable = true): this {
+    this.config.searchable = searchable
+    return this
+  }
+
+  createable(createable = true): this {
+    this.config.createable = createable
+    return this
+  }
+
+  multiple(multiple = true): this {
+    this.config.multiple = multiple
+    return this
+  }
+
+  preload(preload = true): this {
+    this.config.preload = preload
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): RelationshipFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    if (!this.config.resource) {
+      throw new Error('Resource name is required')
+    }
+    return this.config as RelationshipFieldConfig
+  }
+}
+
+export const Relationship = {
+  make: (name: string, resource: string) => new RelationshipBuilder(name, resource),
 }
