@@ -5,3 +5,4 @@
 
 export * from './StatsWidget'
 export * from './ChartWidget'
+export * from './WidgetGrid'
