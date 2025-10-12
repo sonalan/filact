@@ -5,6 +5,7 @@
 
 import type { z } from 'zod'
 import type {
+  BaseFieldConfig,
   TextFieldConfig,
   NumberFieldConfig,
   SelectFieldConfig,
@@ -606,4 +607,319 @@ export class SliderBuilder {
 
 export const Slider = {
   make: (name: string) => new SliderBuilder(name),
+}
+
+/**
+ * Date field builder
+ */
+export class DatePickerBuilder {
+  protected config: Partial<DateFieldConfig> = {
+    type: 'date',
+    name: '',
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  placeholder(placeholder: string): this {
+    this.config.placeholder = placeholder
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  minDate(date: Date): this {
+    this.config.minDate = date
+    return this
+  }
+
+  maxDate(date: Date): this {
+    this.config.maxDate = date
+    return this
+  }
+
+  format(format: string): this {
+    this.config.format = format
+    return this
+  }
+
+  showTime(show = true): this {
+    this.config.showTime = show
+    if (show) {
+      this.config.type = 'datetime'
+    }
+    return this
+  }
+
+  timeZone(timeZone: string): this {
+    this.config.timeZone = timeZone
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): DateFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    return this.config as DateFieldConfig
+  }
+}
+
+/**
+ * Date range field builder
+ */
+export class DateRangePickerBuilder extends DatePickerBuilder {
+  constructor(name: string) {
+    super(name)
+    this.config.type = 'daterange'
+  }
+}
+
+/**
+ * Color picker field builder
+ */
+export class ColorPickerBuilder {
+  private config: Partial<BaseFieldConfig> = {
+    name: '',
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  placeholder(placeholder: string): this {
+    this.config.placeholder = placeholder
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): BaseFieldConfig & { type: 'color' } {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    return { ...this.config, type: 'color' } as BaseFieldConfig & { type: 'color' }
+  }
+}
+
+/**
+ * File upload field builder
+ */
+export class FileUploadBuilder {
+  private config: Partial<FileFieldConfig> = {
+    type: 'file',
+    name: '',
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  placeholder(placeholder: string): this {
+    this.config.placeholder = placeholder
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  accept(types: string[]): this {
+    this.config.accept = types
+    return this
+  }
+
+  maxSize(bytes: number): this {
+    this.config.maxSize = bytes
+    return this
+  }
+
+  multiple(multiple = true): this {
+    this.config.multiple = multiple
+    return this
+  }
+
+  maxFiles(count: number): this {
+    this.config.maxFiles = count
+    return this
+  }
+
+  preview(show = true): this {
+    this.config.preview = show
+    return this
+  }
+
+  uploadEndpoint(url: string): this {
+    this.config.uploadEndpoint = url
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): FileFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    return this.config as FileFieldConfig
+  }
+}
+
+/**
+ * Image upload field builder
+ */
+export class ImageUploadBuilder extends FileUploadBuilder {
+  constructor(name: string) {
+    super(name)
+    this.config.type = 'image'
+    this.config.accept = ['image/*']
+    this.config.preview = true
+  }
+}
+
+/**
+ * Factory functions for new field builders
+ */
+export const DatePicker = {
+  make: (name: string) => new DatePickerBuilder(name),
+}
+
+export const DateRangePicker = {
+  make: (name: string) => new DateRangePickerBuilder(name),
+}
+
+export const ColorPicker = {
+  make: (name: string) => new ColorPickerBuilder(name),
+}
+
+export const FileUpload = {
+  make: (name: string) => new FileUploadBuilder(name),
+}
+
+export const ImageUpload = {
+  make: (name: string) => new ImageUploadBuilder(name),
 }
