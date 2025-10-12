@@ -10,6 +10,11 @@ import {
   Checkbox,
   Switch,
   Radio,
+  DatePicker,
+  DateRangePicker,
+  ColorPicker,
+  FileUpload,
+  ImageUpload,
 } from './fields'
 
 describe('Field Builders', () => {
@@ -524,6 +529,513 @@ describe('Field Builders', () => {
       expect(field.label).toBe('Email Address')
       expect(field.required).toBe(true)
       expect(field.placeholder).toBe('you@example.com')
+    })
+  })
+
+  describe('DatePicker', () => {
+    it('should create date picker field', () => {
+      const field = DatePicker.make('birthdate').label('Birth Date').build()
+
+      expect(field.type).toBe('date')
+      expect(field.name).toBe('birthdate')
+      expect(field.label).toBe('Birth Date')
+    })
+
+    it('should set placeholder', () => {
+      const field = DatePicker.make('birthdate')
+        .placeholder('Select date')
+        .build()
+
+      expect(field.placeholder).toBe('Select date')
+    })
+
+    it('should set required', () => {
+      const field = DatePicker.make('birthdate').required().build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set min and max dates', () => {
+      const minDate = new Date('2000-01-01')
+      const maxDate = new Date('2024-12-31')
+      const field = DatePicker.make('birthdate')
+        .minDate(minDate)
+        .maxDate(maxDate)
+        .build()
+
+      expect(field.minDate).toBe(minDate)
+      expect(field.maxDate).toBe(maxDate)
+    })
+
+    it('should set date format', () => {
+      const field = DatePicker.make('birthdate')
+        .format('YYYY-MM-DD')
+        .build()
+
+      expect(field.format).toBe('YYYY-MM-DD')
+    })
+
+    it('should enable time picker', () => {
+      const field = DatePicker.make('appointment').showTime().build()
+
+      expect(field.showTime).toBe(true)
+      expect(field.type).toBe('datetime')
+    })
+
+    it('should set timezone', () => {
+      const field = DatePicker.make('event')
+        .timeZone('America/New_York')
+        .build()
+
+      expect(field.timeZone).toBe('America/New_York')
+    })
+
+    it('should set disabled', () => {
+      const field = DatePicker.make('birthdate').disabled(true).build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set conditional disabled', () => {
+      const condition = (values: Record<string, unknown>) => values.locked === true
+      const field = DatePicker.make('birthdate').disabled(condition).build()
+
+      expect(field.disabled).toBe(condition)
+    })
+
+    it('should set readonly', () => {
+      const field = DatePicker.make('birthdate').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set visible', () => {
+      const field = DatePicker.make('birthdate').visible(true).build()
+
+      expect(field.visible).toBe(true)
+    })
+
+    it('should set helper text', () => {
+      const field = DatePicker.make('birthdate')
+        .helperText('Select your date of birth')
+        .build()
+
+      expect(field.helperText).toBe('Select your date of birth')
+    })
+
+    it('should set default value', () => {
+      const defaultDate = new Date('2000-01-01')
+      const field = DatePicker.make('birthdate').default(defaultDate).build()
+
+      expect(field.default).toBe(defaultDate)
+    })
+
+    it('should set column span', () => {
+      const field = DatePicker.make('birthdate').columnSpan(2).build()
+
+      expect(field.columnSpan).toBe(2)
+    })
+
+    it('should set validation schema', () => {
+      const schema = z.date().min(new Date('1900-01-01'))
+      const field = DatePicker.make('birthdate').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = DatePicker.make('')
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should chain multiple methods', () => {
+      const minDate = new Date('2000-01-01')
+      const field = DatePicker.make('birthdate')
+        .label('Birth Date')
+        .required()
+        .minDate(minDate)
+        .format('MM/DD/YYYY')
+        .helperText('Enter your birth date')
+        .build()
+
+      expect(field.label).toBe('Birth Date')
+      expect(field.required).toBe(true)
+      expect(field.minDate).toBe(minDate)
+      expect(field.format).toBe('MM/DD/YYYY')
+      expect(field.helperText).toBe('Enter your birth date')
+    })
+  })
+
+  describe('DateRangePicker', () => {
+    it('should create date range picker field', () => {
+      const field = DateRangePicker.make('dateRange')
+        .label('Date Range')
+        .build()
+
+      expect(field.type).toBe('daterange')
+      expect(field.name).toBe('dateRange')
+      expect(field.label).toBe('Date Range')
+    })
+
+    it('should set min and max dates', () => {
+      const minDate = new Date('2024-01-01')
+      const maxDate = new Date('2024-12-31')
+      const field = DateRangePicker.make('dateRange')
+        .minDate(minDate)
+        .maxDate(maxDate)
+        .build()
+
+      expect(field.minDate).toBe(minDate)
+      expect(field.maxDate).toBe(maxDate)
+    })
+
+    it('should set required', () => {
+      const field = DateRangePicker.make('dateRange').required().build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set format', () => {
+      const field = DateRangePicker.make('dateRange')
+        .format('YYYY-MM-DD')
+        .build()
+
+      expect(field.format).toBe('YYYY-MM-DD')
+    })
+
+    it('should set placeholder', () => {
+      const field = DateRangePicker.make('dateRange')
+        .placeholder('Select date range')
+        .build()
+
+      expect(field.placeholder).toBe('Select date range')
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = DateRangePicker.make('')
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+  })
+
+  describe('ColorPicker', () => {
+    it('should create color picker field', () => {
+      const field = ColorPicker.make('color').label('Color').build()
+
+      expect(field.type).toBe('color')
+      expect(field.name).toBe('color')
+      expect(field.label).toBe('Color')
+    })
+
+    it('should set placeholder', () => {
+      const field = ColorPicker.make('color')
+        .placeholder('Choose a color')
+        .build()
+
+      expect(field.placeholder).toBe('Choose a color')
+    })
+
+    it('should set required', () => {
+      const field = ColorPicker.make('color').required().build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set disabled', () => {
+      const field = ColorPicker.make('color').disabled(true).build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set conditional disabled', () => {
+      const condition = (values: Record<string, unknown>) => values.locked === true
+      const field = ColorPicker.make('color').disabled(condition).build()
+
+      expect(field.disabled).toBe(condition)
+    })
+
+    it('should set readonly', () => {
+      const field = ColorPicker.make('color').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set visible', () => {
+      const field = ColorPicker.make('color').visible(true).build()
+
+      expect(field.visible).toBe(true)
+    })
+
+    it('should set helper text', () => {
+      const field = ColorPicker.make('color')
+        .helperText('Choose your favorite color')
+        .build()
+
+      expect(field.helperText).toBe('Choose your favorite color')
+    })
+
+    it('should set default value', () => {
+      const field = ColorPicker.make('color').default('#ff0000').build()
+
+      expect(field.default).toBe('#ff0000')
+    })
+
+    it('should set column span', () => {
+      const field = ColorPicker.make('color').columnSpan(2).build()
+
+      expect(field.columnSpan).toBe(2)
+    })
+
+    it('should set validation schema', () => {
+      const schema = z.string().regex(/^#[0-9A-Fa-f]{6}$/)
+      const field = ColorPicker.make('color').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = ColorPicker.make('')
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should chain multiple methods', () => {
+      const field = ColorPicker.make('color')
+        .label('Theme Color')
+        .required()
+        .default('#3b82f6')
+        .helperText('Select a theme color')
+        .build()
+
+      expect(field.label).toBe('Theme Color')
+      expect(field.required).toBe(true)
+      expect(field.default).toBe('#3b82f6')
+      expect(field.helperText).toBe('Select a theme color')
+    })
+  })
+
+  describe('FileUpload', () => {
+    it('should create file upload field', () => {
+      const field = FileUpload.make('document').label('Document').build()
+
+      expect(field.type).toBe('file')
+      expect(field.name).toBe('document')
+      expect(field.label).toBe('Document')
+    })
+
+    it('should set placeholder', () => {
+      const field = FileUpload.make('document')
+        .placeholder('Upload file')
+        .build()
+
+      expect(field.placeholder).toBe('Upload file')
+    })
+
+    it('should set required', () => {
+      const field = FileUpload.make('document').required().build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set accepted file types', () => {
+      const field = FileUpload.make('document')
+        .accept(['.pdf', '.doc', '.docx'])
+        .build()
+
+      expect(field.accept).toEqual(['.pdf', '.doc', '.docx'])
+    })
+
+    it('should set max file size', () => {
+      const field = FileUpload.make('document')
+        .maxSize(5 * 1024 * 1024) // 5MB
+        .build()
+
+      expect(field.maxSize).toBe(5 * 1024 * 1024)
+    })
+
+    it('should enable multiple files', () => {
+      const field = FileUpload.make('documents').multiple().build()
+
+      expect(field.multiple).toBe(true)
+    })
+
+    it('should set max files limit', () => {
+      const field = FileUpload.make('documents')
+        .multiple()
+        .maxFiles(5)
+        .build()
+
+      expect(field.maxFiles).toBe(5)
+    })
+
+    it('should enable preview', () => {
+      const field = FileUpload.make('document').preview().build()
+
+      expect(field.preview).toBe(true)
+    })
+
+    it('should set upload endpoint', () => {
+      const field = FileUpload.make('document')
+        .uploadEndpoint('/api/upload')
+        .build()
+
+      expect(field.uploadEndpoint).toBe('/api/upload')
+    })
+
+    it('should set disabled', () => {
+      const field = FileUpload.make('document').disabled(true).build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set conditional disabled', () => {
+      const condition = (values: Record<string, unknown>) => values.locked === true
+      const field = FileUpload.make('document').disabled(condition).build()
+
+      expect(field.disabled).toBe(condition)
+    })
+
+    it('should set readonly', () => {
+      const field = FileUpload.make('document').readonly(true).build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set visible', () => {
+      const field = FileUpload.make('document').visible(true).build()
+
+      expect(field.visible).toBe(true)
+    })
+
+    it('should set helper text', () => {
+      const field = FileUpload.make('document')
+        .helperText('Upload your document')
+        .build()
+
+      expect(field.helperText).toBe('Upload your document')
+    })
+
+    it('should set default value', () => {
+      const field = FileUpload.make('document').default(null).build()
+
+      expect(field.default).toBe(null)
+    })
+
+    it('should set column span', () => {
+      const field = FileUpload.make('document').columnSpan(2).build()
+
+      expect(field.columnSpan).toBe(2)
+    })
+
+    it('should set validation schema', () => {
+      const schema = z.instanceof(File)
+      const field = FileUpload.make('document').validate(schema).build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = FileUpload.make('')
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should chain multiple methods', () => {
+      const field = FileUpload.make('document')
+        .label('Upload Document')
+        .required()
+        .accept(['.pdf'])
+        .maxSize(10 * 1024 * 1024)
+        .preview()
+        .helperText('Maximum file size: 10MB')
+        .build()
+
+      expect(field.label).toBe('Upload Document')
+      expect(field.required).toBe(true)
+      expect(field.accept).toEqual(['.pdf'])
+      expect(field.maxSize).toBe(10 * 1024 * 1024)
+      expect(field.preview).toBe(true)
+      expect(field.helperText).toBe('Maximum file size: 10MB')
+    })
+  })
+
+  describe('ImageUpload', () => {
+    it('should create image upload field', () => {
+      const field = ImageUpload.make('avatar').label('Avatar').build()
+
+      expect(field.type).toBe('image')
+      expect(field.name).toBe('avatar')
+      expect(field.label).toBe('Avatar')
+    })
+
+    it('should default to image mime types', () => {
+      const field = ImageUpload.make('avatar').build()
+
+      expect(field.accept).toEqual(['image/*'])
+    })
+
+    it('should enable preview by default', () => {
+      const field = ImageUpload.make('avatar').build()
+
+      expect(field.preview).toBe(true)
+    })
+
+    it('should set required', () => {
+      const field = ImageUpload.make('avatar').required().build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set max file size', () => {
+      const field = ImageUpload.make('avatar')
+        .maxSize(2 * 1024 * 1024) // 2MB
+        .build()
+
+      expect(field.maxSize).toBe(2 * 1024 * 1024)
+    })
+
+    it('should enable multiple images', () => {
+      const field = ImageUpload.make('gallery').multiple().build()
+
+      expect(field.multiple).toBe(true)
+    })
+
+    it('should set max images limit', () => {
+      const field = ImageUpload.make('gallery')
+        .multiple()
+        .maxFiles(10)
+        .build()
+
+      expect(field.maxFiles).toBe(10)
+    })
+
+    it('should set upload endpoint', () => {
+      const field = ImageUpload.make('avatar')
+        .uploadEndpoint('/api/upload/image')
+        .build()
+
+      expect(field.uploadEndpoint).toBe('/api/upload/image')
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = ImageUpload.make('')
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should chain multiple methods', () => {
+      const field = ImageUpload.make('avatar')
+        .label('Profile Picture')
+        .required()
+        .maxSize(5 * 1024 * 1024)
+        .helperText('Upload a profile picture')
+        .build()
+
+      expect(field.label).toBe('Profile Picture')
+      expect(field.required).toBe(true)
+      expect(field.maxSize).toBe(5 * 1024 * 1024)
+      expect(field.helperText).toBe('Upload a profile picture')
     })
   })
 })
