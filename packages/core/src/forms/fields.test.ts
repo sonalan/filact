@@ -15,6 +15,7 @@ import {
   ColorPicker,
   FileUpload,
   ImageUpload,
+  Repeater,
 } from './fields'
 
 describe('Field Builders', () => {
@@ -1036,6 +1037,299 @@ describe('Field Builders', () => {
       expect(field.required).toBe(true)
       expect(field.maxSize).toBe(5 * 1024 * 1024)
       expect(field.helperText).toBe('Upload a profile picture')
+    })
+  })
+
+  describe('Repeater', () => {
+    it('should create repeater field', () => {
+      const field = Repeater.make('contacts')
+        .label('Contacts')
+        .fields([
+          TextInput.make('name').label('Name').build(),
+          EmailInput.make('email').label('Email').build(),
+        ])
+        .build()
+
+      expect(field.type).toBe('repeater')
+      expect(field.name).toBe('contacts')
+      expect(field.label).toBe('Contacts')
+      expect(field.fields).toHaveLength(2)
+    })
+
+    it('should set nested fields', () => {
+      const nameField = TextInput.make('name').label('Name').build()
+      const emailField = EmailInput.make('email').label('Email').build()
+      const field = Repeater.make('users')
+        .fields([nameField, emailField])
+        .build()
+
+      expect(field.fields).toHaveLength(2)
+      expect(field.fields[0]).toBe(nameField)
+      expect(field.fields[1]).toBe(emailField)
+    })
+
+    it('should set min items', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .min(2)
+        .build()
+
+      expect(field.min).toBe(2)
+    })
+
+    it('should set max items', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .max(5)
+        .build()
+
+      expect(field.max).toBe(5)
+    })
+
+    it('should set min and max constraints', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .min(1)
+        .max(10)
+        .build()
+
+      expect(field.min).toBe(1)
+      expect(field.max).toBe(10)
+    })
+
+    it('should set add label', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .addLabel('Add Item')
+        .build()
+
+      expect(field.addLabel).toBe('Add Item')
+    })
+
+    it('should set remove label', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .removeLabel('Remove Item')
+        .build()
+
+      expect(field.removeLabel).toBe('Remove Item')
+    })
+
+    it('should enable collapsible', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .collapsible()
+        .build()
+
+      expect(field.collapsible).toBe(true)
+    })
+
+    it('should disable collapsible', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .collapsible(false)
+        .build()
+
+      expect(field.collapsible).toBe(false)
+    })
+
+    it('should enable orderable', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .orderable()
+        .build()
+
+      expect(field.orderable).toBe(true)
+    })
+
+    it('should disable orderable', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .orderable(false)
+        .build()
+
+      expect(field.orderable).toBe(false)
+    })
+
+    it('should set required', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .required()
+        .build()
+
+      expect(field.required).toBe(true)
+    })
+
+    it('should set disabled', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .disabled(true)
+        .build()
+
+      expect(field.disabled).toBe(true)
+    })
+
+    it('should set conditional disabled', () => {
+      const condition = (values: Record<string, unknown>) => values.locked === true
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .disabled(condition)
+        .build()
+
+      expect(field.disabled).toBe(condition)
+    })
+
+    it('should set readonly', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .readonly(true)
+        .build()
+
+      expect(field.readonly).toBe(true)
+    })
+
+    it('should set visible', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .visible(true)
+        .build()
+
+      expect(field.visible).toBe(true)
+    })
+
+    it('should set helper text', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .helperText('Add multiple items')
+        .build()
+
+      expect(field.helperText).toBe('Add multiple items')
+    })
+
+    it('should set default value', () => {
+      const defaultValue = [{ name: 'Item 1' }]
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .default(defaultValue)
+        .build()
+
+      expect(field.default).toBe(defaultValue)
+    })
+
+    it('should set column span', () => {
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .columnSpan(2)
+        .build()
+
+      expect(field.columnSpan).toBe(2)
+    })
+
+    it('should set validation schema', () => {
+      const schema = z.array(z.object({ name: z.string() })).min(1)
+      const field = Repeater.make('items')
+        .fields([TextInput.make('name').build()])
+        .validate(schema)
+        .build()
+
+      expect(field.validation).toBe(schema)
+    })
+
+    it('should throw error if name is missing', () => {
+      const builder = Repeater.make('')
+        .fields([TextInput.make('name').build()])
+
+      expect(() => builder.build()).toThrow('Field name is required')
+    })
+
+    it('should throw error if fields are empty', () => {
+      const builder = Repeater.make('items')
+
+      expect(() => builder.build()).toThrow('Repeater field must have at least one field')
+    })
+
+    it('should throw error if fields array is empty', () => {
+      const builder = Repeater.make('items').fields([])
+
+      expect(() => builder.build()).toThrow('Repeater field must have at least one field')
+    })
+
+    it('should support complex nested fields', () => {
+      const field = Repeater.make('addresses')
+        .label('Addresses')
+        .fields([
+          TextInput.make('street').label('Street').required().build(),
+          TextInput.make('city').label('City').required().build(),
+          TextInput.make('state').label('State').build(),
+          TextInput.make('zip').label('ZIP Code').pattern('^\\d{5}$').build(),
+          Select.make('country')
+            .label('Country')
+            .options([
+              { value: 'us', label: 'United States' },
+              { value: 'ca', label: 'Canada' },
+            ])
+            .build(),
+        ])
+        .build()
+
+      expect(field.fields).toHaveLength(5)
+      expect(field.fields[0].name).toBe('street')
+      expect(field.fields[1].name).toBe('city')
+      expect(field.fields[2].name).toBe('state')
+      expect(field.fields[3].name).toBe('zip')
+      expect(field.fields[4].name).toBe('country')
+    })
+
+    it('should chain multiple methods', () => {
+      const field = Repeater.make('contacts')
+        .label('Contacts')
+        .fields([
+          TextInput.make('name').label('Name').build(),
+          EmailInput.make('email').label('Email').build(),
+        ])
+        .min(1)
+        .max(5)
+        .addLabel('Add Contact')
+        .removeLabel('Remove Contact')
+        .collapsible()
+        .orderable()
+        .helperText('Add up to 5 contacts')
+        .build()
+
+      expect(field.label).toBe('Contacts')
+      expect(field.fields).toHaveLength(2)
+      expect(field.min).toBe(1)
+      expect(field.max).toBe(5)
+      expect(field.addLabel).toBe('Add Contact')
+      expect(field.removeLabel).toBe('Remove Contact')
+      expect(field.collapsible).toBe(true)
+      expect(field.orderable).toBe(true)
+      expect(field.helperText).toBe('Add up to 5 contacts')
+    })
+
+    it('should support nested repeaters', () => {
+      const addressRepeater = Repeater.make('phoneNumbers')
+        .fields([
+          TextInput.make('number').label('Phone Number').build(),
+          Select.make('type')
+            .label('Type')
+            .options([
+              { value: 'mobile', label: 'Mobile' },
+              { value: 'home', label: 'Home' },
+            ])
+            .build(),
+        ])
+        .build()
+
+      const field = Repeater.make('contacts')
+        .fields([
+          TextInput.make('name').label('Name').build(),
+          addressRepeater as any,
+        ])
+        .build()
+
+      expect(field.fields).toHaveLength(2)
+      expect(field.fields[1].type).toBe('repeater')
     })
   })
 })

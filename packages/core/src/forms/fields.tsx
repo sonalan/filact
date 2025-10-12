@@ -15,6 +15,8 @@ import type {
   DateFieldConfig,
   FileFieldConfig,
   SliderFieldConfig,
+  RepeaterFieldConfig,
+  Field,
 } from '../types'
 
 /**
@@ -922,4 +924,113 @@ export const FileUpload = {
 
 export const ImageUpload = {
   make: (name: string) => new ImageUploadBuilder(name),
+}
+
+/**
+ * Repeater field builder
+ */
+export class RepeaterBuilder {
+  private config: Partial<RepeaterFieldConfig> = {
+    type: 'repeater',
+    name: '',
+    fields: [],
+  }
+
+  constructor(name: string) {
+    this.config.name = name
+  }
+
+  label(label: string): this {
+    this.config.label = label
+    return this
+  }
+
+  fields(fields: Field[]): this {
+    this.config.fields = fields
+    return this
+  }
+
+  min(min: number): this {
+    this.config.min = min
+    return this
+  }
+
+  max(max: number): this {
+    this.config.max = max
+    return this
+  }
+
+  addLabel(label: string): this {
+    this.config.addLabel = label
+    return this
+  }
+
+  removeLabel(label: string): this {
+    this.config.removeLabel = label
+    return this
+  }
+
+  collapsible(collapsible = true): this {
+    this.config.collapsible = collapsible
+    return this
+  }
+
+  orderable(orderable = true): this {
+    this.config.orderable = orderable
+    return this
+  }
+
+  required(required = true): this {
+    this.config.required = required
+    return this
+  }
+
+  disabled(disabled: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.disabled = disabled
+    return this
+  }
+
+  readonly(readonly: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.readonly = readonly
+    return this
+  }
+
+  visible(visible: boolean | ((values: Record<string, unknown>) => boolean)): this {
+    this.config.visible = visible
+    return this
+  }
+
+  helperText(text: string): this {
+    this.config.helperText = text
+    return this
+  }
+
+  default(value: unknown): this {
+    this.config.default = value
+    return this
+  }
+
+  columnSpan(span: number): this {
+    this.config.columnSpan = span
+    return this
+  }
+
+  validate(schema: z.ZodType): this {
+    this.config.validation = schema
+    return this
+  }
+
+  build(): RepeaterFieldConfig {
+    if (!this.config.name) {
+      throw new Error('Field name is required')
+    }
+    if (!this.config.fields || this.config.fields.length === 0) {
+      throw new Error('Repeater field must have at least one field')
+    }
+    return this.config as RepeaterFieldConfig
+  }
+}
+
+export const Repeater = {
+  make: (name: string) => new RepeaterBuilder(name),
 }
