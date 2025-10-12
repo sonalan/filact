@@ -6,3 +6,4 @@
 export * from './StatsWidget'
 export * from './ChartWidget'
 export * from './WidgetGrid'
+export * from './CustomWidget'
