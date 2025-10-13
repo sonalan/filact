@@ -27,8 +27,13 @@ export const handlers = [
     const page = parseInt(url.searchParams.get('page') || '1')
     const perPage = parseInt(url.searchParams.get('perPage') || url.searchParams.get('limit') || '10')
 
+    // Paginate the data
+    const startIndex = (page - 1) * perPage
+    const endIndex = startIndex + perPage
+    const paginatedUsers = mockUsers.slice(startIndex, endIndex)
+
     return HttpResponse.json({
-      data: mockUsers,
+      data: paginatedUsers,
       total: mockUsers.length,
       page,
       perPage,
