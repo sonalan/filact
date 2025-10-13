@@ -32,7 +32,7 @@ export function useResourceOne<TModel extends BaseModel>(
     queryKey: [config.model.endpoint, 'one', id],
     queryFn: () => {
       if (!id) throw new Error('ID is required')
-      return config.provider.getOne<TModel>(config.model.endpoint, { id })
+      return config.provider.getOne<TModel>(config.model.endpoint, id)
     },
     enabled: !!id,
   })
@@ -57,7 +57,7 @@ export function useResourceCreate<TModel extends BaseModel>(
         }
       }
 
-      const created = await config.provider.create<TModel>(config.model.endpoint, processedData)
+      const created = await config.provider.create<TModel>(config.model.endpoint, { data: processedData })
 
       // Run afterCreate hook
       if (config.hooks?.afterCreate) {
@@ -84,7 +84,7 @@ export function useResourceUpdate<TModel extends BaseModel>(
   return useMutation({
     mutationFn: async ({ id, data }: { id: string | number; data: Partial<TModel> }) => {
       // Get current record for beforeUpdate hook
-      const current = await config.provider.getOne<TModel>(config.model.endpoint, { id })
+      const current = await config.provider.getOne<TModel>(config.model.endpoint, id)
 
       // Run beforeUpdate hook
       let processedData = data
@@ -123,7 +123,7 @@ export function useResourceDelete<TModel extends BaseModel>(
   return useMutation({
     mutationFn: async (id: string | number) => {
       // Get record for beforeDelete hook
-      const record = await config.provider.getOne<TModel>(config.model.endpoint, { id })
+      const record = await config.provider.getOne<TModel>(config.model.endpoint, id)
 
       // Run beforeDelete hook
       if (config.hooks?.beforeDelete) {

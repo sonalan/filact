@@ -133,6 +133,11 @@ class FetchHttpClient implements HttpClient {
         )
       }
 
+      // Handle 204 No Content
+      if (response.status === 204) {
+        return undefined as T
+      }
+
       const data = await response.json()
       return data as T
     } catch (error) {
