@@ -37,8 +37,8 @@ describe('useResource Hooks', () => {
         total: 2,
       }),
       getOne: vi.fn().mockResolvedValue({ id: 1, name: 'User 1', email: 'user1@test.com' }),
-      create: vi.fn().mockImplementation((_, data) => Promise.resolve({ id: 3, ...data })),
-      update: vi.fn().mockImplementation((_, { data }) => Promise.resolve({ id: 1, ...data })),
+      create: vi.fn().mockImplementation((_, params) => Promise.resolve({ id: 3, ...params.data })),
+      update: vi.fn().mockImplementation((_, params) => Promise.resolve({ id: 1, ...params.data })),
       delete: vi.fn().mockResolvedValue(undefined),
       deleteMany: vi.fn().mockResolvedValue(undefined),
       updateMany: vi.fn().mockResolvedValue(undefined),
@@ -87,7 +87,7 @@ describe('useResource Hooks', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-      expect(mockProvider.getOne).toHaveBeenCalledWith('/users', { id: 1 })
+      expect(mockProvider.getOne).toHaveBeenCalledWith('/users', 1)
       expect(result.current.data).toEqual({ id: 1, name: 'User 1', email: 'user1@test.com' })
     })
 
@@ -112,7 +112,7 @@ describe('useResource Hooks', () => {
 
       await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
-      expect(mockProvider.create).toHaveBeenCalledWith('/users', newUser)
+      expect(mockProvider.create).toHaveBeenCalledWith('/users', { data: newUser })
       expect(result.current.data).toEqual({ id: 3, ...newUser })
     })
 
@@ -132,7 +132,7 @@ describe('useResource Hooks', () => {
       await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
       expect(beforeCreate).toHaveBeenCalled()
-      expect(mockProvider.create).toHaveBeenCalledWith('/users', { name: 'Modified', email: 'modified@test.com' })
+      expect(mockProvider.create).toHaveBeenCalledWith('/users', { data: { name: 'Modified', email: 'modified@test.com' } })
     })
 
     it('should run afterCreate hook', async () => {
