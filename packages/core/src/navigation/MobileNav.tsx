@@ -82,6 +82,7 @@ export function MobileNav({
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           ${className}
         `}
+        data-testid="mobile-menu"
       >
         <Sidebar
           activePath={activePath}
@@ -95,6 +96,8 @@ export function MobileNav({
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
           aria-label="Close navigation"
+          data-testid="menu-close"
+          style={{ minWidth: '44px', minHeight: '44px' }}
         >
           <svg
             className="w-5 h-5 text-gray-600"
