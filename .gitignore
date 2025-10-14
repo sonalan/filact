@@ -50,5 +50,9 @@ lerna-debug.log*
 # Turbo
 .turbo/
 
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
 # OS
 Thumbs.db
