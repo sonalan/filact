@@ -5,4 +5,5 @@
 
 export * from './Sidebar'
 export * from './MobileNav'
+export * from './MenuToggle'
 export * from './useNavigation'
